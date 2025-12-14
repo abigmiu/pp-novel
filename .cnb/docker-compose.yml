@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: a12346789
+    volumes:
+      - /persistent/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - /persistent/redis:/var/lib/mysql
+    ports:
+      - "6379:6379"

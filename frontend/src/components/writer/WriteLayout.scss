@@ -1,0 +1,38 @@
+@use "../../assets/_mixin.scss" as mixin;
+
+
+@include mixin.b('writer-layout') {
+    @include mixin.e('menu-item') {
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 22px;
+        padding: 11px 28px;
+        display: flex;
+        align-items: center;
+        &:hover {
+            background-color: #00000005;
+            border-radius: 8px;
+        }
+
+        &-icon {
+            width: 16px;
+            height: 16px;
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        &-label {
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        &-arrow {
+        //    justify-self: flex-end;
+        margin-left: auto;
+        }
+    }
+
+
+}

@@ -1,0 +1,37 @@
+@use "../../assets/_mixin.scss" as mixin;
+
+@include mixin.b(writer-login) {
+    @include mixin.e(form-wrapper) {
+        margin-right: 120px;
+        width: 428px;
+        padding: 40px 32px 0;
+        border-radius: 12px;
+    }
+
+    @include mixin.e(tab-wrapper) {
+        margin-bottom: 40px;
+    }
+
+    @include mixin.e(tab) {
+        margin-right: 20px;
+        font-size: 18px;
+        list-style: 22px;
+        color: #000;
+        opacity: 0.2;
+        transition: opacity 0.2s;
+        cursor: pointer;
+
+        @include mixin.m(active) {
+            opacity: 1;
+            font-weight: 500;
+        }
+    }
+
+    @include mixin.e(code) {
+        cursor: pointer;
+
+        @include mixin.m(disabled) {
+            cursor: not-allowed;
+        }
+    }
+}

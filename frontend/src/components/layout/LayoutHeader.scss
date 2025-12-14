@@ -1,0 +1,15 @@
+@use "../../assets/_mixin.scss" as mixin;
+
+@include mixin.b('layout-header') {
+    height: 80px;
+    font-size: 14px;
+    color: #000;
+
+    .writer-header-menu {
+        margin-right: 40px;
+        cursor: pointer;
+        &:hover {
+            color: rgb(var(--primary-5));
+        }
+    }
+}

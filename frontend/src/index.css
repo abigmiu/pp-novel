@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    --primary-linear-gradient: linear-gradient(96deg, #ff9a62, #ff5f00), #ff5f00;
+    --primary-7: 210, 70, 0;
+    --primary-6: 255, 95, 0;
+    --primary-5: 255, 130, 46;
+    --primary-4: 255, 163, 93;
+    --primary-3: 255, 193, 139;
+    --primary-2: 255, 220, 186;
+    --primary-1: 255, 244, 232;
+}
+
+.serial-card {
+    background-color: #fff;
+    border-radius: 12px
+}
+
+.serial-card-small {
+    padding: 12px
+}
+
+.serial-card-normal {
+    padding: 24px
+}
+
+.serial-card-large {
+    padding: 32px
+}

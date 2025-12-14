@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: dev
+    include: local
+  # 需要添加空的mail配置， 具体配置还是在对应的环境里面，不然会报错没有JavaMailSender这个Bean
+  mail:
+    username:
+    password:
+    port:
+    host:
+
+signKey:
+  webUserPassword: 123456
+
+
+s3:
+  bucket: bucket
+  region: region
+  access-key: access-key
+  secret-key: secret-key 
+  endpoint: domain

@@ -1,0 +1,34 @@
+$:
+  vscode:
+    - docker:
+        image: docker.cnb.cool/abigmiu/baseenv
+      services:
+        - vscode
+        - docker
+      runner:
+        cpus: 6
+      stages:
+        - name: 启动 mysql 和 redis
+          script: docker compose -f .cnb/docker-compose.yml up -d
+        - name: 恢复 mysql 和 redis 数据
+          script: sh .cnb/restore.sh
+        - name: 安装依赖
+          script: sh .cnb/init.sh
+      endStages:
+        - name: 备份数据
+          script: sh .cnb/backup.sh
+
+# 推送到github
+.sync_to_github: &sync_to_github
+  docker:
+    image: alpine/git:latest
+  imports:
+    - https://cnb.cool/abigmiu/keys/-/blob/main/keys.yml
+  stages:
+    - name: sync-to-github
+      script: sh .build/sync-to-github.sh
+
+# 匹配所有分支
+"**":
+  push:
+    - *sync_to_github
