@@ -137,3 +137,19 @@
 
 
 
+# 实现
+先 配置 rabbitmq src/main/java/org/ppnovel/web/configuration/RabbitConfiguration.java
+
+注意，要转json 变成 string 才能通信
+
+```java
+@Bean
+public RabbitTemplate rabbitTemplate(
+    ConnectionFactory connectionFactory,
+    MessageConverter messageConverter
+) {
+    RabbitTemplate template = new RabbitTemplate( connectionFactory);
+    template.setMessageConverter(messageConverter);
+    return template;
+}
+```

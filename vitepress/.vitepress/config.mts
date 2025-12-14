@@ -7,7 +7,7 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: '开始', link: '/' },
+      { text: '开始', link: '/server' },
     ],
 
     sidebar: [
@@ -15,7 +15,6 @@ export default defineConfig({
         text: '后端',
         items: [
           { text: '邮件', link: '/server/mail' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
         ]
       }
     ],

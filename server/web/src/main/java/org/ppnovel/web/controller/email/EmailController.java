@@ -26,7 +26,7 @@ public class EmailController {
     @PostMapping("test")
     @SaIgnore
     public void test() {
-        this.emailService.sendMail("test@qq.com", "主题名称", "邮件内容");
+        this.emailService.sendTestMail();
     }
 
     @Operation(summary = "发送邮件验证码")
