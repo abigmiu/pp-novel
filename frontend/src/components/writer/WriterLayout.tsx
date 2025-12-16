@@ -5,16 +5,20 @@ import { useNamespace } from "@/hooks/useNameSpace";
 import { Divider } from "@arco-design/web-react";
 import type { ReactNode } from "react";
 import type React from "react";
-import { Outlet } from "react-router";
+import { Link, Outlet, useNavigate } from "react-router";
 import './WriteLayout.scss';
 import { IconUp } from "@arco-design/web-react/icon";
 
 const LayoutMenu: React.FC = () => {
     // 这里应该是通过icon + 数组渲染， 懒得做
     const ns = useNamespace('writer-layout')
+
+    const navigate = useNavigate()
+
+
     return (
-        <div className={`serial-card serial-card-small `} style={{ width: '240px', marginRight: '20px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto', 'scrollbarWidth': 'none' }}>
-            <div className={`${ns.e('menu-item')}`}>
+        <div className={`serial-card serial-card-small `} style={{ width: '240px', marginRight: '20px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto', 'scrollbarWidth': 'none', position: 'fixed' }}>
+            <div className={`${ns.e('menu-item')}`} onClick={() => navigate('/writer/home')}>
                 <div className={`${ns.e('menu-item-icon')}`}>
                     <img src="data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTg0OS4yMzcgMTM2LjUzM2M0OC4yNiAwIDg3LjM4MiAzOS4xOTMgODcuMzgyIDg3LjU0djQ1Ni44NWMwIDQ4LjM0Ni0zOS4xMjIgODcuNTQtODcuMzgyIDg3LjU0bC0zMDcuMi0uMDAydjYxLjU1M2gyNDcuMTI2djYwLjE4M0gyMzQuODM3di02MC4xODNoMjQ3LjEyNlY3NjguNDZsLTMwNy4yLjAwMWMtNDguMjYgMC04Ny4zODItMzkuMTkzLTg3LjM4Mi04Ny41NFYyMjQuMDczYzAtNDguMzQ3IDM5LjEyMi04Ny41NCA4Ny4zODItODcuNTRoNjc0LjQ3NHptMCA2MC4xODRIMTc0Ljc2M2MtMTUuMDgxIDAtMjcuMzA3IDEyLjI0OC0yNy4zMDcgMjcuMzU2djQ1Ni44NWMwIDE1LjEwOCAxMi4yMjYgMjcuMzU1IDI3LjMwNyAyNy4zNTVoNjc0LjQ3NGMxNS4wODEgMCAyNy4zMDctMTIuMjQ3IDI3LjMwNy0yNy4zNTZWMjI0LjA3M2MwLTE1LjEwOC0xMi4yMjYtMjcuMzU2LTI3LjMwNy0yNy4zNTZ6TTcxNi44IDM0OS41MjVsNDIuNDggNDIuNTU3TDY0NS44NzUgNTA1LjY5Yy0zNy4zMjQgMzcuMzkyLTk3LjgzNyAzNy4zOTItMTM1LjE2IDBsLTUyLjcyNy01Mi44MjFjLTEzLjg2My0xMy44ODktMzYuMzQtMTMuODg5LTUwLjIwMyAwbC0xMDMuMTYzIDEwMy4zNS00Mi40NzktNDIuNTU2IDEwMy4xNjMtMTAzLjM1YzM3LjMyNC0zNy4zOTIgOTcuODM3LTM3LjM5MiAxMzUuMTYxIDBsNTIuNzI2IDUyLjgyMWMxMy44NjMgMTMuODg4IDM2LjM0IDEzLjg4OCA1MC4yMDMgMEw3MTYuOCAzNDkuNTI1eiIgZmlsbD0iIzcwNzA3MCIvPjwvc3ZnPg==" alt="" />
 
@@ -38,7 +42,8 @@ const LayoutMenu: React.FC = () => {
                     </div>
                     <div className={`${ns.e('menu-item-label')}`}>小说</div>
                 </div>
-                <div className={`${ns.e('menu-item')}`}>
+
+                <div className={`${ns.e('menu-item')}`} onClick={() => navigate('/writer/short-manage')}>
                     <div className={`${ns.e('menu-item-icon')}`}>
                         {/* <img src="data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTgzMiA3Njh2NjRhNjQgNjQgMCAwIDEtNjQgNjRIMjU2YTY0IDY0IDAgMCAxIDAtMTI4aDU3Nm02NC02NEgyNTZhMTI4IDEyOCAwIDAgMCAwIDI1Nmg1MTJhMTI4IDEyOCAwIDAgMCAxMjgtMTI4VjcwNHoiIGZpbGw9IiM3MDcwNzAiLz48cGF0aCBkPSJNNzE1LjMwNyA2NEgzMDguNjkzQzIwOC45MDcgNjQgMTI4IDEzNi4zNzMgMTI4IDIyNS42djYwMS4wNjdsNjQtMzEuNDY3VjIyNS42YzAtNTMuODEzIDUyLjM3My05Ny42IDExNi42OTMtOTcuNmg0MDYuNjE0Qzc3OS42MjcgMTI4IDgzMiAxNzEuNzg3IDgzMiAyMjUuNnY1NDUuNDkzaDY0VjIyNS42Qzg5NiAxMzYuMzczIDgxNS4wOTMgNjQgNzE1LjMwNyA2NHoiIGZpbGw9IiM3MDcwNzAiLz48L3N2Zz4=" alt="" /> */}
                     </div>
@@ -151,7 +156,7 @@ const LayoutMenu: React.FC = () => {
                     </div>
                     <div className={`${ns.e('menu-item-label')}`}>新书预热</div>
                 </div>
-                 <div className={`${ns.e('menu-item')}`}>
+                <div className={`${ns.e('menu-item')}`}>
                     <div className={`${ns.e('menu-item-icon')}`}>
                         {/* <img src="data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTgzMiA3Njh2NjRhNjQgNjQgMCAwIDEtNjQgNjRIMjU2YTY0IDY0IDAgMCAxIDAtMTI4aDU3Nm02NC02NEgyNTZhMTI4IDEyOCAwIDAgMCAwIDI1Nmg1MTJhMTI4IDEyOCAwIDAgMCAxMjgtMTI4VjcwNHoiIGZpbGw9IiM3MDcwNzAiLz48cGF0aCBkPSJNNzE1LjMwNyA2NEgzMDguNjkzQzIwOC45MDcgNjQgMTI4IDEzNi4zNzMgMTI4IDIyNS42djYwMS4wNjdsNjQtMzEuNDY3VjIyNS42YzAtNTMuODEzIDUyLjM3My05Ny42IDExNi42OTMtOTcuNmg0MDYuNjE0Qzc3OS42MjcgMTI4IDgzMiAxNzEuNzg3IDgzMiAyMjUuNnY1NDUuNDkzaDY0VjIyNS42Qzg5NiAxMzYuMzczIDgxNS4wOTMgNjQgNzE1LjMwNyA2NHoiIGZpbGw9IiM3MDcwNzAiLz48L3N2Zz4=" alt="" /> */}
                     </div>
@@ -184,33 +189,27 @@ const WriterLayout: React.FC = () => {
                 backgroundColor: '#f8f8f8',
                 minHeight: '100vh'
             }}>
-            <div style={{
-                backgroundColor: '#ffffff'
-            }}>
+            <LayoutHeader
+                left={
+                    <div className="flex items-center">
+                        <img src={Logo} alt='logo'></img>
+                        <Divider type={'vertical'}></Divider>
+                        <span className="cursor-pointer">作家专区</span>
+                    </div>
+                }
+                right={
+                    <div className="flex items-center">
+                        <div className="writer-header-menu">西红柿小说网</div>
+                        <div className="writer-header-menu">作家课堂</div>
+                        <div className="writer-header-menu">作家福利</div>
+                        <div className="writer-header-menu">消息通知</div>
+                        <Divider type={'vertical'}></Divider>
+                        <LayoutHeaderUserInfo></LayoutHeaderUserInfo>
 
-                <div className="container mx-auto" >
-                    <LayoutHeader
-                        left={
-                            <div className="flex items-center">
-                                <img src={Logo} alt='logo'></img>
-                                <Divider type={'vertical'}></Divider>
-                                <span className="cursor-pointer">作家专区</span>
-                            </div>
-                        }
-                        right={
-                            <div className="flex items-center">
-                                <div className="writer-header-menu">西红柿小说网</div>
-                                <div className="writer-header-menu">作家课堂</div>
-                                <div className="writer-header-menu">作家福利</div>
-                                <div className="writer-header-menu">消息通知</div>
-                                <Divider type={'vertical'}></Divider>
-                                <LayoutHeaderUserInfo></LayoutHeaderUserInfo>
+                    </div>
+                }
+            ></LayoutHeader>
 
-                            </div>
-                        }
-                    ></LayoutHeader>
-                </div>
-            </div>
 
 
             <div className="container mx-auto flex" style={{
@@ -218,7 +217,9 @@ const WriterLayout: React.FC = () => {
             }}>
 
                 <LayoutMenu></LayoutMenu>
-                <div className="flex-1">
+                <div className="flex-1" style={{
+                    marginLeft: '260px',
+                }}>
                     <Outlet />
                 </div>
 

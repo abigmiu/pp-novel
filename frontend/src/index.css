@@ -29,3 +29,7 @@ body {
 .serial-card-large {
     padding: 32px
 }
+
+.arco-btn-primary:not(.arco-btn-disabled) {
+    background: var(--primary-linear-gradient);
+}

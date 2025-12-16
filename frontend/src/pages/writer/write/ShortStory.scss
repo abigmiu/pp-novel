@@ -1,0 +1,22 @@
+.pm-placeholder {
+    pointer-events: none;
+    color: #999;
+    white-space: pre-wrap;
+    display: block;
+    line-height: 1.2;
+    pointer-events: none;
+    user-select: none;
+    font-size: 12px;
+    cursor: text;
+    text-indent: initial;
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+    position: absolute;
+}
+
+.pm-placeholder::before {
+    content: "";
+    display: block;
+    height: 0;
+}

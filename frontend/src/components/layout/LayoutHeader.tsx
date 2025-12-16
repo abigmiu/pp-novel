@@ -7,16 +7,22 @@ interface ILayoutHeaderProps {
     right: ReactNode,
 }
 
-function LayoutHeader({ left,  right }: ILayoutHeaderProps) {
+function LayoutHeader({ left, right }: ILayoutHeaderProps) {
     const ns = useNamespace('layout-header');
     return (
-        <header className={`flex justify-between items-center ${ns.b()}`}>
-            {/* left */}
-            <div>{ left }</div>
-           
-            {/* right */}
-            <div>{ right }</div>
-        </header>
+        <div className={`${ns.b()}`}>
+            <div className={`${ns.e('wrapper')}`}>
+                <header className={`container mx-auto  flex justify-between items-center h-full`}>
+                    {/* left */}
+                    <div>{left}</div>
+
+                    {/* right */}
+                    <div>{right}</div>
+                </header>
+            </div>
+        </div>
+
+
     )
 
 }

@@ -3,7 +3,7 @@ import Logo from '@/assets/logo.svg';
 import LayoutHeaderUserInfo from "@/components/layout/LayoutHeaderUserInfo";
 function ReaderLayout() {
     return (
-        <div className="container mx-auto">
+        <>
             <LayoutHeader
                 left={
                     <img src={Logo} alt='logo'></img>
@@ -16,7 +16,12 @@ function ReaderLayout() {
             >
 
             </LayoutHeader>
-        </div>
+
+            <div className="container mx-auto">
+
+            </div>
+
+        </>
     )
 }
 

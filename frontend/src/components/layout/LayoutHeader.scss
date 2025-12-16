@@ -5,9 +5,24 @@
     font-size: 14px;
     color: #000;
 
+    @include mixin.e('wrapper') {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        height: 80px;
+    }
+
+
+
+
+
+
     .writer-header-menu {
         margin-right: 40px;
         cursor: pointer;
+
         &:hover {
             color: rgb(var(--primary-5));
         }
