@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaIgnore;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.ppnovel.common.dto.web.shortStory.ShortStoryCategoryListResponse;
+import org.ppnovel.common.dto.web.shortStory.ShortStoryCategoryTreeRes;
 import org.ppnovel.web.service.shortStory.ShortStoryCategoryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,5 +28,12 @@ public class ShortStoryCategoryController {
     @SaIgnore
     public ArrayList<ShortStoryCategoryListResponse> getShortStoryCategoryList() {
         return shortStoryCategoryService.getCategoryList();
+    }
+
+    @Operation(summary = "获取树型数据")
+    @GetMapping("tree")
+    @SaIgnore
+    public ArrayList<ShortStoryCategoryTreeRes> getShortStoryCategoryTree() {
+        return shortStoryCategoryService.getCategoryTree();
     }
 }

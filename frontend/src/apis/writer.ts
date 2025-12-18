@@ -19,3 +19,4 @@ export type IRWriterCountStatRes = z.infer<typeof ZWriterCountStat>;
 export function RGetWriterStat() {
     return request.get<IRWriterCountStatRes>('/web/writer/stat')
 }
+

@@ -43,3 +43,7 @@ s3:
   access-key: access-key
   secret-key: secret-key 
   endpoint: domain
+
+#aliOss:
+#  accessKey: xxx
+#  secretKey: xxx

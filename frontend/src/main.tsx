@@ -6,11 +6,15 @@ import './index.css'
 import 'virtual:uno.css'
 import { RouterProvider } from 'react-router';
 import router from './routers';
-
+import { ConfigProvider } from '@arco-design/web-react';
+import zhCN from '@arco-design/web-react/es/locale/zh-CN';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider
-      router={router}
-    ></RouterProvider>
+    <ConfigProvider locale={zhCN}>
+      <RouterProvider
+        router={router}
+      ></RouterProvider>
+    </ConfigProvider>
+
   </StrictMode>,
 )

@@ -19,5 +19,5 @@ public class ShortStoryCategoryEntity {
     private String cover;
 
     @TableField("parent_id")
-    private Long parentId;
+    private Integer parentId;
 }

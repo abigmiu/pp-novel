@@ -207,7 +207,7 @@ function RenderImageCanvas() {
   )
 }
 
-function CoverClip() {
+const CoverClip: React.FC = ()=> {
   return (
     <div>
       <div>
