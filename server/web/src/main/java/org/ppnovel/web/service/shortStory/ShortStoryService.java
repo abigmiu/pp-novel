@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -226,12 +228,39 @@ public class ShortStoryService {
         return new PageResponse(page);
     }
 
+    public void deleteStoryCategories(Integer storyId) {
+        LambdaQueryWrapper<ShortStoryRelateCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShortStoryRelateCategoryEntity::getStoryId, storyId);
+        shortStoryRelateCategoryMapper.delete(queryWrapper);
+    }
+
+    public void deleteDraftCategories(Integer draftId) {
+        LambdaQueryWrapper<ShortStoryDraftRelateCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShortStoryDraftRelateCategoryEntity::getStoryId, draftId);
+
+        shortStoryDraftRelateCategoryMapper.delete(queryWrapper);
+    }
+
+    public void deleteSelfDraft(Integer draftId) {
+        LambdaQueryWrapper<ShortStoryDraftEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShortStoryDraftEntity::getId, draftId);
+        queryWrapper.eq(ShortStoryDraftEntity::getAuthorId, SaTokenUtil.getUserId());
+        ShortStoryDraftEntity foundData =  shortStoryDraftMapper.selectOne(queryWrapper);
+        if (foundData == null) {
+            throw new BusinessException("草稿不存在");
+        }
+        shortStoryDraftMapper.deleteById(foundData.getId());
+        deleteDraftCategories(foundData.getId());
+    }
 
     public PageResponse<DraftPageRes> getSelfDraftPageData(DraftPageReq queryReq) {
         LambdaQueryWrapper<ShortStoryDraftEntity> queryWrapper = new LambdaQueryWrapper<>();
 
+        queryWrapper.eq(ShortStoryDraftEntity::getAuthorId, SaTokenUtil.getUserId());
         if (queryReq.isDataSortDesc()) {
             queryWrapper.orderByDesc(ShortStoryDraftEntity::getCreatedAt);
+        } else {
+            queryWrapper.orderByAsc(ShortStoryDraftEntity::getCreatedAt);
         }
 
         Page<ShortStoryDraftEntity> page = new Page<>(queryReq.getPage(), queryReq.getSize());
@@ -242,8 +271,42 @@ public class ShortStoryService {
     }
 
     private PageResponse<DraftPageRes> buildDraftPageRes(Page<ShortStoryDraftEntity> entityPage) {
-        List<DraftPageRes> records = entityPage.getRecords()
-            .stream()
+        List<ShortStoryDraftEntity> draftEntities = entityPage.getRecords();
+        if (draftEntities.isEmpty()) {
+            Page<DraftPageRes> emptyPage = new Page<>();
+            emptyPage.setPages(entityPage.getPages());
+            emptyPage.setSize(entityPage.getSize());
+            emptyPage.setTotal(entityPage.getTotal());
+            emptyPage.setRecords(new ArrayList<>());
+            return new PageResponse<DraftPageRes>(emptyPage);
+        }
+
+        List<Integer> draftIds = draftEntities.stream()
+            .map(ShortStoryDraftEntity::getId)
+            .toList();
+
+        LambdaQueryWrapper<ShortStoryDraftRelateCategoryEntity> relateQuery = new LambdaQueryWrapper<>();
+        relateQuery.in(ShortStoryDraftRelateCategoryEntity::getStoryId, draftIds);
+        List<ShortStoryDraftRelateCategoryEntity> relateList = shortStoryDraftRelateCategoryMapper.selectList(relateQuery);
+
+        Map<Integer, List<Integer>> draftToCategoryIds = relateList.stream()
+            .collect(Collectors.groupingBy(
+                ShortStoryDraftRelateCategoryEntity::getStoryId,
+                Collectors.mapping(ShortStoryDraftRelateCategoryEntity::getCategoryId, Collectors.toList())
+            ));
+
+        List<Integer> categoryIds = relateList.stream()
+            .map(ShortStoryDraftRelateCategoryEntity::getCategoryId)
+            .distinct()
+            .toList();
+
+        Map<Integer, ShortStoryCategoryEntity> categoryMap = categoryIds.isEmpty()
+            ? Map.of()
+            : shortStoryCategoryMapper.selectBatchIds(categoryIds)
+                .stream()
+                .collect(Collectors.toMap(ShortStoryCategoryEntity::getId, c -> c));
+
+        List<DraftPageRes> records = draftEntities.stream()
             .map(e -> {
                 DraftPageRes data = new DraftPageRes();
                 data.setId(e.getId());
@@ -253,24 +316,21 @@ public class ShortStoryService {
                 data.setUpdatedAt(e.getUpdatedAt());
                 data.setCreatedAt(e.getCreatedAt());
 
-                List<ShortStoryCategorySimpleListItem> categories = new ArrayList<>();
-                data.setCategories(categories);
-                ShortStoryCategoryEntity category = new ShortStoryCategoryEntity();
-                LambdaQueryWrapper<ShortStoryDraftRelateCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.eq(ShortStoryDraftRelateCategoryEntity::getStoryId, e.getId());
-                List<ShortStoryDraftRelateCategoryEntity> foundRelateList = shortStoryDraftRelateCategoryMapper.selectList(queryWrapper);
-                foundRelateList.forEach(item -> {
-                    LambdaQueryWrapper<ShortStoryCategoryEntity> queryWrapper2 = new LambdaQueryWrapper<>();
-                    queryWrapper2.eq(ShortStoryCategoryEntity::getId, item.getCategoryId());
-                    ShortStoryCategoryEntity foundData = shortStoryCategoryMapper.selectOne(queryWrapper2);
-                    if (foundData != null) {
+                List<ShortStoryCategorySimpleListItem> categories = draftToCategoryIds.getOrDefault(e.getId(), List.of())
+                    .stream()
+                    .map(categoryId -> {
+                        ShortStoryCategoryEntity foundData = categoryMap.get(categoryId);
+                        if (foundData == null) {
+                            return null;
+                        }
                         ShortStoryCategorySimpleListItem listItem = new ShortStoryCategorySimpleListItem();
                         listItem.setId(foundData.getId());
                         listItem.setName(foundData.getName());
-                        categories.add(listItem);
-                    }
-                });
-
+                        return listItem;
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
+                data.setCategories(new ArrayList<>(categories));
                 return data;
             })
             .toList();

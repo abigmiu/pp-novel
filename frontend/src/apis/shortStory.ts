@@ -85,3 +85,46 @@ export const ZCreateShortStoryDraftReq: z.ZodType<IRCreateShortStoryDraftReq> = 
 export function RCreateShortStoryDraft(data: IRCreateShortStoryDraftReq) {
     return request.post<void>('/shortStory/draft', data)
 }
+
+export const ZShortStoryDraftCategory = z.object({
+    id: z.number().int(),
+    name: z.string()
+});
+
+export const ZShortStoryDraftItem = z.object({
+    id: z.number().int(),
+    cover: z.string().nullable().optional().nullable(),
+    title: z.string().nullable().optional().nullable(),
+    contentLength: z.number().int().nonnegative().nullable(),
+    categories: z.array(ZShortStoryDraftCategory).default([]),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+});
+
+export const ZShortStoryDraftPageRes = z.object({
+    page: z.number().optional(),
+    size: z.number().optional(),
+    total: z.number().optional(),
+    rows: z.array(ZShortStoryDraftItem)
+});
+
+export type IRShortStoryDraftItem = z.infer<typeof ZShortStoryDraftItem>;
+export type IRShortStoryDraftPageRes = z.infer<typeof ZShortStoryDraftPageRes>;
+
+export interface IRShortStoryDraftPageReq {
+    page?: number;
+    size?: number;
+    dataSortDesc?: boolean;
+}
+
+/** 获取我的短故事草稿分页 */
+export function RGetShortStoryDraftPage(data: IRShortStoryDraftPageReq) {
+    return request.post<IRShortStoryDraftPageRes>('/shortStory/self/draft-page', data);
+}
+
+/** 删除短故事草稿 */
+export function RDeleteShortStoryDraft(draftId: number) {
+    return request.delete<void>('/shortStory/self/delete', {
+        params: { draftId }
+    });
+}

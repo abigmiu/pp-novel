@@ -59,10 +59,16 @@ public class ShortStoryController {
         return shortStoryService.getSelfShortPageData(pageQuery);
     }
 
-    @Operation(summary =  "获取自己的短故事草稿-分页")
+    @Operation(summary = "获取自己的短故事草稿-分页")
     @PostMapping("self/draft-page")
     public PageResponse<DraftPageRes> selfDraftPageQuery(@RequestBody @Validated DraftPageReq pageQuery) {
-        return  shortStoryService.getSelfDraftPageData(pageQuery);
+        return shortStoryService.getSelfDraftPageData(pageQuery);
+    }
+
+    @Operation(summary = "删除自己的短故事草稿")
+    @DeleteMapping("self/delete")
+    public void deleteShortStory(@RequestParam(name = "draftId") @Min(1) Integer draftId) {
+        shortStoryService.deleteSelfDraft(draftId);
     }
 
     @SaIgnore

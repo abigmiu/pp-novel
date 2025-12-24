@@ -22,9 +22,20 @@ const EmptyBlock: React.FC = () => {
 }
 
 const MyShortStory: React.FC = () => {
+    const navigate = useNavigate();
     return (
         <div className="serial-card serial-card-small">
-            <h3>我的短故事</h3>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="m-0">我的短故事</h3>
+                <Button
+                    type="secondary"
+                    shape="round"
+                    size="small"
+                    onClick={() => navigate('/writer/short-draft')}
+                >
+                    草稿箱
+                </Button>
+            </div>
 
             <EmptyBlock></EmptyBlock>
         </div>
