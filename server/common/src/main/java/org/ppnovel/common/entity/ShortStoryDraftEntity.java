@@ -6,9 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-@TableName("short_story")
+/**
+ * 短故事草稿箱
+ */
+@TableName("short_story_draft")
 @Data
-public class ShortStoryEntity extends BaseEntity {
+public class ShortStoryDraftEntity extends  BaseEntity {
 
     /**
      * 故事ID

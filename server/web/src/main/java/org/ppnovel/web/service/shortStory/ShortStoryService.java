@@ -1,44 +1,100 @@
 package org.ppnovel.web.service.shortStory;
-import org.ppnovel.common.entity.UserEntity;
-import org.ppnovel.common.entity.UserShortStoryProgressEntity;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.ppnovel.common.dto.web.shortStory.*;
+import org.ppnovel.common.entity.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.ppnovel.common.constant.ShortStoryStatus;
 import org.ppnovel.common.dto.common.PageResponse;
 import org.ppnovel.common.dto.common.Result;
 import org.ppnovel.common.dto.web.shortStory.CreateShortStory;
-import org.ppnovel.common.dto.web.shortStory.SelfShortStoryPageQuery;
-import org.ppnovel.common.dto.web.shortStory.ShortStoryAuthor;
-import org.ppnovel.common.dto.web.shortStory.ShortStoryDetailResponse;
-import org.ppnovel.common.dto.web.shortStory.SubmitReadingProgress;
-import org.ppnovel.common.entity.ShortStoryAnalyticsEntity;
-import org.ppnovel.common.entity.ShortStoryEntity;
-import org.ppnovel.common.dto.web.shortStory.CreateShortStory;
 import org.ppnovel.common.entity.ShortStoryEntity;
 import org.ppnovel.common.exception.BusinessException;
 import org.ppnovel.common.entity.UserShortStoryProgressEntity;
 
-import org.ppnovel.common.mapper.ShortStoryAnalyticsMapper;
-import org.ppnovel.common.mapper.ShortStoryMapper;
-import org.ppnovel.common.mapper.UserMapper;
-import org.ppnovel.common.mapper.UserShortStoryProgressMapper;
+import org.ppnovel.common.mapper.*;
 import org.ppnovel.web.util.SaTokenUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShortStoryService {
     private final ShortStoryMapper shortStoryMapper;
+    private final ShortStoryDraftMapper shortStoryDraftMapper;
     private final UserMapper userMapper;
     private final ShortStoryAnalyticsMapper shortStoryAnalyticsMapper;
     private final UserShortStoryProgressMapper userShortStoryProgressMapper;
+    private final ShortStoryCategoryMapper shortStoryCategoryMapper;
+    private final ShortStoryDraftRelateCategoryMapper shortStoryDraftRelateCategoryMapper;
+    private final ShortStoryRelateCategoryMapper shortStoryRelateCategoryMapper;
 
-    public ShortStoryService(ShortStoryMapper shortStoryMapper, UserMapper userMapper, ShortStoryAnalyticsMapper shortStoryAnalyticsMapper, UserShortStoryProgressMapper userShortStoryProgressMapper) {
+    public ShortStoryService(
+        ShortStoryMapper shortStoryMapper,
+        UserMapper userMapper,
+        ShortStoryAnalyticsMapper shortStoryAnalyticsMapper,
+        UserShortStoryProgressMapper userShortStoryProgressMapper,
+        ShortStoryDraftMapper shortStoryDraftMapper,
+        ShortStoryCategoryMapper shortStoryCategoryMapper,
+        ShortStoryDraftRelateCategoryMapper shortStoryDraftRelateCategoryMapper,
+        ShortStoryRelateCategoryMapper shortStoryRelateCategoryMapper) {
         this.shortStoryMapper = shortStoryMapper;
         this.userMapper = userMapper;
         this.shortStoryAnalyticsMapper = shortStoryAnalyticsMapper;
         this.userShortStoryProgressMapper = userShortStoryProgressMapper;
+        this.shortStoryDraftMapper = shortStoryDraftMapper;
+        this.shortStoryCategoryMapper = shortStoryCategoryMapper;
+        this.shortStoryDraftRelateCategoryMapper = shortStoryDraftRelateCategoryMapper;
+        this.shortStoryRelateCategoryMapper = shortStoryRelateCategoryMapper;
+    }
+
+    /**
+     * 删除草稿箱
+     *
+     * @param draftId 草稿箱id
+     */
+    private void deleteDraft(Integer draftId) {
+        shortStoryDraftMapper.deleteById(draftId);
+    }
+
+    private void updateDraftReletCategoryIds(Integer draftId, List<Integer> categoryIds) {
+        LambdaQueryWrapper<ShortStoryDraftRelateCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShortStoryDraftRelateCategoryEntity::getStoryId, draftId);
+
+        shortStoryDraftRelateCategoryMapper.delete(queryWrapper);
+
+        categoryIds.forEach(categoryId -> {
+            ShortStoryDraftRelateCategoryEntity categoryEntity = new ShortStoryDraftRelateCategoryEntity();
+            categoryEntity.setCategoryId(categoryId);
+            categoryEntity.setStoryId(draftId);
+            shortStoryDraftRelateCategoryMapper.insert(categoryEntity);
+        });
+    }
+
+    private void updateStoryRelateCategoryIds(Integer storyId, List<Integer> categoryIds) {
+        LambdaQueryWrapper<ShortStoryRelateCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShortStoryRelateCategoryEntity::getStoryId, storyId);
+        shortStoryRelateCategoryMapper.delete(queryWrapper);
+
+        categoryIds.forEach(categoryId -> {
+            ShortStoryRelateCategoryEntity categoryEntity = new ShortStoryRelateCategoryEntity();
+            categoryEntity.setCategoryId(categoryId);
+            categoryEntity.setStoryId(storyId);
+            shortStoryRelateCategoryMapper.insert(categoryEntity);
+        });
+    }
+
+    private List<ShortStoryCategorySimpleListItem> findCategories(Integer draftId) {
+        LambdaQueryWrapper<ShortStoryDraftRelateCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShortStoryDraftRelateCategoryEntity::getStoryId, draftId);
+        List<ShortStoryDraftRelateCategoryEntity> relateEntity = shortStoryDraftRelateCategoryMapper.selectList(queryWrapper);
+        List<ShortStoryCategorySimpleListItem> categoryIds = new ArrayList<>();
+        return new ArrayList<>();
     }
 
     public void createShortStory(CreateShortStory createDto) {
@@ -50,6 +106,15 @@ public class ShortStoryService {
             throw new BusinessException("试读比例和试读段落数必须同时传");
         }
 
+        Integer authorId = SaTokenUtil.getUserId();
+        ShortStoryDraftEntity draftEntity = null;
+        if (createDto.getDraftId() != null) {
+            draftEntity = shortStoryDraftMapper.selectById(createDto.getDraftId());
+            if (draftEntity == null || !authorId.equals(draftEntity.getAuthorId())) {
+                throw new BusinessException("草稿不存在或无权发布");
+            }
+        }
+
         ShortStoryEntity shortStoryEntity = new ShortStoryEntity();
         shortStoryEntity.setTitle(createDto.getTitle());
         shortStoryEntity.setContent(createDto.getContent());
@@ -59,9 +124,52 @@ public class ShortStoryService {
         shortStoryEntity.setFreeParagraph(createDto.getFreeParagraph());
         shortStoryEntity.setRecommendTitle(createDto.getRecommendTitle());
         shortStoryEntity.setContentLength(createDto.getContent().length());
-        shortStoryEntity.setAuthorId(SaTokenUtil.getUserId());
+        shortStoryEntity.setAuthorId(authorId);
         shortStoryEntity.setStatus(ShortStoryStatus.UNDER_REVIEW);
         shortStoryMapper.insert(shortStoryEntity);
+        if (draftEntity != null) {
+            deleteDraft(draftEntity.getId());
+        }
+
+        updateStoryRelateCategoryIds(shortStoryEntity.getId(), createDto.getCategoryIds());
+    }
+
+    public void createShortStoryDraft(CreateShortStoryDraft reqBody) {
+        Integer authorId = SaTokenUtil.getUserId();
+        ShortStoryDraftEntity draftEntity;
+        if (reqBody.getDraftId() != null) {
+            draftEntity = shortStoryDraftMapper.selectById(reqBody.getDraftId());
+            if (draftEntity == null || !authorId.equals(draftEntity.getAuthorId())) {
+                throw new BusinessException("草稿不存在或无权修改");
+            }
+        } else {
+            draftEntity = new ShortStoryDraftEntity();
+            draftEntity.setAuthorId(authorId);
+            draftEntity.setStatus(ShortStoryStatus.DRAFT);
+        }
+
+        draftEntity.setTitle(reqBody.getTitle());
+        String content = reqBody.getContent();
+
+
+        draftEntity.setContent(content);
+        draftEntity.setContentLength(content == null ? 0 : content.length());
+        draftEntity.setCover(reqBody.getCover());
+        draftEntity.setToutiaoCover(reqBody.getToutiaoCover());
+        draftEntity.setFreeRate(reqBody.getFreeRate());
+        draftEntity.setFreeParagraph(reqBody.getFreeParagraph());
+        draftEntity.setRecommendTitle(reqBody.getRecommendTitle());
+        draftEntity.setStatus(ShortStoryStatus.DRAFT);
+        draftEntity.setAuthorId(authorId);
+
+        if (draftEntity.getId() == null) {
+            shortStoryDraftMapper.insert(draftEntity);
+
+        } else {
+            shortStoryDraftMapper.updateById(draftEntity);
+        }
+
+        updateDraftReletCategoryIds(draftEntity.getId(), reqBody.getCategoryIds());
     }
 
     public ShortStoryDetailResponse getShortStoryDetail(Long id) {
@@ -116,6 +224,62 @@ public class ShortStoryService {
 
         page = shortStoryMapper.selectPage(page, queryWrapper);
         return new PageResponse(page);
+    }
+
+
+    public PageResponse<DraftPageRes> getSelfDraftPageData(DraftPageReq queryReq) {
+        LambdaQueryWrapper<ShortStoryDraftEntity> queryWrapper = new LambdaQueryWrapper<>();
+
+        if (queryReq.isDataSortDesc()) {
+            queryWrapper.orderByDesc(ShortStoryDraftEntity::getCreatedAt);
+        }
+
+        Page<ShortStoryDraftEntity> page = new Page<>(queryReq.getPage(), queryReq.getSize());
+        page = shortStoryDraftMapper.selectPage(page, queryWrapper);
+
+
+        return buildDraftPageRes(page);
+    }
+
+    private PageResponse<DraftPageRes> buildDraftPageRes(Page<ShortStoryDraftEntity> entityPage) {
+        List<DraftPageRes> records = entityPage.getRecords()
+            .stream()
+            .map(e -> {
+                DraftPageRes data = new DraftPageRes();
+                data.setId(e.getId());
+                data.setTitle(e.getTitle());
+                data.setCover(e.getCover());
+                data.setContentLength(e.getContentLength());
+                data.setUpdatedAt(e.getUpdatedAt());
+                data.setCreatedAt(e.getCreatedAt());
+
+                List<ShortStoryCategorySimpleListItem> categories = new ArrayList<>();
+                data.setCategories(categories);
+                ShortStoryCategoryEntity category = new ShortStoryCategoryEntity();
+                LambdaQueryWrapper<ShortStoryDraftRelateCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.eq(ShortStoryDraftRelateCategoryEntity::getStoryId, e.getId());
+                List<ShortStoryDraftRelateCategoryEntity> foundRelateList = shortStoryDraftRelateCategoryMapper.selectList(queryWrapper);
+                foundRelateList.forEach(item -> {
+                    LambdaQueryWrapper<ShortStoryCategoryEntity> queryWrapper2 = new LambdaQueryWrapper<>();
+                    queryWrapper2.eq(ShortStoryCategoryEntity::getId, item.getCategoryId());
+                    ShortStoryCategoryEntity foundData = shortStoryCategoryMapper.selectOne(queryWrapper2);
+                    if (foundData != null) {
+                        ShortStoryCategorySimpleListItem listItem = new ShortStoryCategorySimpleListItem();
+                        listItem.setId(foundData.getId());
+                        listItem.setName(foundData.getName());
+                        categories.add(listItem);
+                    }
+                });
+
+                return data;
+            })
+            .toList();
+        Page<DraftPageRes> newPage = new Page<>();
+        newPage.setPages(entityPage.getPages());
+        newPage.setSize(entityPage.getSize());
+        newPage.setTotal(entityPage.getTotal());
+        newPage.setRecords(records);
+        return new PageResponse<DraftPageRes>(newPage);
     }
 
     private int getBucket(int readingTime) {
@@ -194,4 +358,3 @@ public class ShortStoryService {
         shortStoryAnalyticsMapper.updateById(analyticsEntity);
     }
 }
-

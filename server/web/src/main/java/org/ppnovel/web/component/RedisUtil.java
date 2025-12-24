@@ -57,7 +57,7 @@ public class RedisUtil {
             Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
             Map<Object, Object> result = new HashMap<>();
             for (Map.Entry<Object, Object> entry : entries.entrySet()) {
-                System.out.println(entry.getValue().getClass().toString());
+//                System.out.println(entry.getValue().getClass().toString());
                 String jsonValue = objectMapper.writeValueAsString(entry.getValue());
                 result.put(entry.getKey(), objectMapper.readValue(jsonValue, clazz));
             }

@@ -2,6 +2,8 @@ package org.ppnovel.common.constant;
 
 /** 短故事状态 */
 public class ShortStoryStatus {
+    static public  Integer DRAFT = 0;
+
     /**
      * 审核中
      */

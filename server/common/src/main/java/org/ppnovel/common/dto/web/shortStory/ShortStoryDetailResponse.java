@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Schema(description = "短故事详情")
 public class ShortStoryDetailResponse {
     @Schema(description = "短故事id")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "标题")
     private String title;

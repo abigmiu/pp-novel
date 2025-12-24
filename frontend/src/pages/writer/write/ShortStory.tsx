@@ -1,6 +1,6 @@
 import { Button, Cascader, InputNumber, Message, Modal, Popover, Grid, Slider, Upload } from "@arco-design/web-react";
 import { IconArrowLeft, IconInfoCircle, IconMinus, IconRotateLeft, IconPlus } from "@arco-design/web-react/icon";
-import React, { createContext, useContext, useEffect, useReducer, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { keymap } from "prosemirror-keymap";
 import { baseKeymap } from "prosemirror-commands";
 
@@ -12,12 +12,14 @@ import { Decoration, DecorationSet } from "prosemirror-view";
 import EasyCropper from 'react-easy-crop';
 
 
-import './ShortStory.scss'
-import { RGetShortStoryCategoryTree, ZShortStoryCategoryTreeRes, type IRShortStoryCategoryTreeRes } from "@/apis/shortStory";
+import './ShortStory.scss';
+import { RCreateShortStoryDraft, RGetShortStoryCategoryTree, ZShortStoryCategoryTreeRes, type IRShortStoryCategoryTreeRes } from "@/apis/shortStory";
 import { useMount } from "ahooks";
 import CoverClip from "./components/CoverClip";
 import { RGetShortStoryCoverUploadUrl } from "@/apis/upload";
 import type { RequestOptions } from "@arco-design/web-react/es/Upload";
+import type { UploadItem } from "@arco-design/web-react/es/Upload/interface";
+import * as z from "zod";
 
 function placeholderPlugin(text: string) {
     return new Plugin({
@@ -91,7 +93,7 @@ const keymapPlugin = keymap({
     }
 });
 
-const setupEditor = (el: HTMLElement) => {
+const setupEditor = (el: HTMLElement, onDocChange?: (content: string) => void) => {
 
     // 根据 schema 定义，创建 editorState 数据实例
     const editorState = EditorState.create({
@@ -104,12 +106,18 @@ const setupEditor = (el: HTMLElement) => {
         ]
     })
 
+    let editorView: EditorView;
     // 创建编辑器视图实例，并挂在到 el 上
-    const editorView = new EditorView(el, {
-        state: editorState
+    editorView = new EditorView(el, {
+        state: editorState,
+        dispatchTransaction(transaction) {
+            const newState = editorView.state.apply(transaction);
+            editorView.updateState(newState);
+            onDocChange?.(newState.doc.textContent);
+        }
     })
 
-    console.log('editorView', editorView)
+    onDocChange?.(editorState.doc.textContent);
     return editorView;
 }
 
@@ -117,9 +125,17 @@ const setupEditor = (el: HTMLElement) => {
 // 写短故事
 type IEditState = {
     title: string;
+    content: string;
+    cover: string;
+    categoryIds: number[];
+    freeRate: number;
 }
 type IEditAction =
     | { type: 'SET_TITLE'; payload: string }
+    | { type: 'SET_CONTENT'; payload: string }
+    | { type: 'SET_COVER'; payload: string }
+    | { type: 'SET_CATEGORY'; payload: number[] }
+    | { type: 'SET_FREE_RATE'; payload: number };
 
 
 function editorReducer(state: IEditState, action: IEditAction): IEditState {
@@ -129,6 +145,26 @@ function editorReducer(state: IEditState, action: IEditAction): IEditState {
                 ...state,
                 title: action.payload.slice(0, 25) // 双保险
             }
+        case "SET_CONTENT":
+            return {
+                ...state,
+                content: action.payload
+            }
+        case "SET_COVER":
+            return {
+                ...state,
+                cover: action.payload
+            }
+        case "SET_CATEGORY":
+            return {
+                ...state,
+                categoryIds: action.payload
+            }
+        case "SET_FREE_RATE":
+            return {
+                ...state,
+                freeRate: Math.min(100, Math.max(0, action.payload))
+            }
         default:
             return state
     }
@@ -136,12 +172,16 @@ function editorReducer(state: IEditState, action: IEditAction): IEditState {
 
 const StateContext = createContext<{
     state: IEditState,
-    dispatch: React.Dispatch<IEditAction>
+    dispatch: React.Dispatch<IEditAction>,
+    submitDraft: () => Promise<void>,
+    submitForReview: () => Promise<void>,
+    submitting: boolean,
 } | null>(null);
 
 const PublishHeader: React.FC = () => {
     const ctx = useContext(StateContext);
-    if (!ctx) return;
+    if (!ctx) return null;
+    const wordCount = ctx.state.content.trim().length;
     return (
         <div style={{
             background: '#fff',
@@ -157,12 +197,12 @@ const PublishHeader: React.FC = () => {
                 <IconArrowLeft />
                 <div className="ml-4">
                     <div>{ctx.state.title || '未命名短故事'}</div>
-                    <div className="text-gray">已保存 正文字数 19</div>
+                    <div className="text-gray">已保存 正文字数 {wordCount}</div>
                 </div>
             </div>
             <div className="flex items-center">
-                <Button shape="round">存草稿</Button>
-                <Button className="ml-6" type="outline" shape="round">下一步</Button>
+                <Button shape="round" loading={ctx.submitting} onClick={ctx.submitDraft}>存草稿</Button>
+                <Button className="ml-6" type="outline" shape="round" loading={ctx.submitting} onClick={ctx.submitForReview}>下一步</Button>
             </div>
 
 
@@ -174,16 +214,22 @@ const Editor: React.FC = () => {
     const ctx = useContext(StateContext);
     const editorRef = useRef<HTMLDivElement | null>(null)
     const viewRef = useRef<EditorView | null>(null);
+    const dispatch = ctx?.dispatch;
 
     useEffect(() => {
-        if (!editorRef.current) return
-        viewRef.current = setupEditor(editorRef.current)
+        if (!editorRef.current || !dispatch) return;
+        viewRef.current = setupEditor(editorRef.current, (content) => {
+            dispatch({
+                type: 'SET_CONTENT',
+                payload: content
+            })
+        })
         return () => {
             viewRef.current?.destroy();
             viewRef.current = null;
         };
-    }, [])
-    if (!ctx) return;
+    }, [dispatch])
+    if (!ctx) return null;
     return (
         <div className=" w-full">
             <div className="flex w-full">
@@ -197,6 +243,7 @@ const Editor: React.FC = () => {
                     }}
                     maxLength={25}
                     placeholder="请输入短故事名称"
+                    value={ctx.state.title}
                     onChange={e => ctx.dispatch({
                         type: 'SET_TITLE',
                         payload: e.target.value
@@ -217,8 +264,15 @@ const Editor: React.FC = () => {
 }
 
 
-async function _getCroppedImg(url, pixelCrop, rotation = 0) {
-    const image = await new Promise((resolve, reject) => {
+interface PixelCrop {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
+async function _getCroppedImg(url: string, pixelCrop: PixelCrop, rotation = 0): Promise<Blob | null> {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
         const image = new Image();
         image.addEventListener('load', () => resolve(image));
         image.addEventListener('error', (error) => reject(error));
@@ -257,15 +311,21 @@ async function _getCroppedImg(url, pixelCrop, rotation = 0) {
     });
 } // 裁剪组件
 
-const Cropper = (props) => {
-    const { file, onOk } = props;
+interface CropperProps {
+    file: File;
+    onOk: (file: File) => void;
+    onCancel: () => void;
+}
+
+const Cropper: React.FC<CropperProps> = (props) => {
+    const { file } = props;
     const [crop, setCrop] = useState({
         x: 0,
         y: 0,
     });
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState(undefined)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelCrop | null>(null)
 
     const url = React.useMemo(() => {
         return URL.createObjectURL(file);
@@ -318,7 +378,9 @@ const Cropper = (props) => {
                         step={0.1}
                         value={zoom}
                         onChange={(v) => {
-                            setZoom(v);
+                            if (typeof v === 'number') {
+                                setZoom(v);
+                            }
                         }}
                         min={0.8}
                         max={3}
@@ -344,6 +406,7 @@ const Cropper = (props) => {
                 <Button
                     type='primary'
                     onClick={async () => {
+                        if (!croppedAreaPixels) return;
                         const blob = await _getCroppedImg(url || '', croppedAreaPixels, rotation);
 
                         if (blob) {
@@ -361,7 +424,7 @@ const Cropper = (props) => {
     );
 };
 
-async function upload(options: RequestOptions) {
+async function upload(options: RequestOptions, onUploaded?: (url: string) => void) {
     const { onProgress, onError, onSuccess, file } = options;
     console.log("🚀 ~ upload ~ file:", file);
 
@@ -377,6 +440,7 @@ async function upload(options: RequestOptions) {
         });
         if (response.ok) {
             onSuccess({ url: presignedUrl.downloadUlr })
+            onUploaded?.(presignedUrl.downloadUlr)
         } else {
             onError();
         }
@@ -387,18 +451,100 @@ async function upload(options: RequestOptions) {
 
 }
 
+type TCategoryOption = Omit<IRShortStoryCategoryTreeRes, 'id' | 'children'> & {
+    id: string;
+    children?: TCategoryOption[];
+};
+
 const StoryConfig: React.FC = () => {
-    const [categoryOptions, setCategoryOptions] = useState<IRShortStoryCategoryTreeRes[]>([]);
+    const [categoryOptions, setCategoryOptions] = useState<TCategoryOption[]>([]);
+    const ctx = useContext(StateContext);
+
     const fetchCategory = async () => {
         const res = await RGetShortStoryCategoryTree();
-        const valid = ZShortStoryCategoryTreeRes.safeParse(res);
-        if (valid) {
-            setCategoryOptions(res);
+        console.log("🚀 ~ fetchCategory ~ res:", res);
+        
+        const result = z.array(ZShortStoryCategoryTreeRes).safeParse(res);
+        res.forEach(item => {
+            item.children = item.children || [];
+        })
+        if (result.success) {
+            const convertIds = (items: IRShortStoryCategoryTreeRes[]): TCategoryOption[] => {
+                return items.map(item => ({
+                    ...item,
+                    id: String(item.id),
+                    children: item.children ? convertIds(item.children) : []
+                }));
+            };
+            setCategoryOptions(convertIds(res));
+        } else {
+            console.error('获取分类失败', result.error);
         }
     }
     useMount(() => {
         fetchCategory();
     })
+    if (!ctx) return null;
+    const { state, dispatch } = ctx;
+    const uploadFileList = useMemo<UploadItem[]>(() => state.cover ? [{
+        uid: state.cover,
+        name: 'cover',
+        status: 'done',
+        url: state.cover
+    }] : [], [state.cover]);
+
+    const handleUpload = useCallback((options: RequestOptions) => {
+        return upload(options, (url) => {
+            dispatch({
+                type: 'SET_COVER',
+                payload: url
+            })
+        });
+    }, [dispatch]);
+
+    const cascaderValue = useMemo<(string | string[])[] | undefined>(() => {
+        if (!state.categoryIds.length) {
+            return undefined;
+        }
+        const findPath = (options: TCategoryOption[], targetId: string, path: string[] = []): string[] | null => {
+            for (const option of options) {
+                const currentPath = [...path, option.id];
+                if (option.id === targetId) {
+                    return currentPath;
+                }
+                if (option.children?.length) {
+                    const result = findPath(option.children, targetId, currentPath);
+                    if (result) {
+                        return result;
+                    }
+                }
+            }
+            return null;
+        };
+        const paths = state.categoryIds.map((id) => findPath(categoryOptions, id.toString())).filter((path): path is string[] => Array.isArray(path));
+        return paths.length ? paths : undefined;
+    }, [state.categoryIds, categoryOptions]);
+
+    const handleCategoryChange = (value: (string | string[])[] | undefined) => {
+        const ids = (value ?? []).map((item) => {
+            const path = Array.isArray(item) ? item : [item];
+            const last = path[path.length - 1];
+            const numeric = Number(last);
+            return Number.isFinite(numeric) ? numeric : null;
+        }).filter((id): id is number => typeof id === 'number' && Number.isFinite(id));
+        dispatch({
+            type: 'SET_CATEGORY',
+            payload: ids
+        })
+    }
+
+    const handleFreeRateChange = (value: number | string) => {
+        const numeric = typeof value === 'number' ? value : Number(value);
+        dispatch({
+            type: 'SET_FREE_RATE',
+            payload: Number.isFinite(numeric) ? Number(numeric) : 0
+        })
+    }
 
     return (
         <div>
@@ -424,7 +570,15 @@ const StoryConfig: React.FC = () => {
                         listType="picture-card"
 
                         limit={1}
-                        customRequest={upload}
+                        fileList={uploadFileList}
+                        customRequest={handleUpload}
+                        onRemove={() => {
+                            dispatch({
+                                type: 'SET_COVER',
+                                payload: ''
+                            })
+                            return true;
+                        }}
                         beforeUpload={(file) => {
                             return new Promise((resolve) => {
                                 const modal = Modal.confirm({
@@ -464,14 +618,17 @@ const StoryConfig: React.FC = () => {
 
                 <div className="">
                     <Cascader
+                        mode="multiple"
                         placeholder='请选择作品分类'
                         style={{ width: 300, marginBottom: 20 }}
                         options={categoryOptions}
+                        value={cascaderValue}
                         fieldNames={{
                             label: 'name',
                             value: 'id',
                             children: 'children'
                         }}
+                        onChange={handleCategoryChange}
                     />
                 </div>
             </div>
@@ -484,10 +641,11 @@ const StoryConfig: React.FC = () => {
                     <InputNumber
                         min={0}
                         max={100}
-                        defaultValue={50}
+                        value={state.freeRate}
                         suffix='%'
                         step={1}
                         style={{ width: 160, margin: '10px 24px 10px 0' }}
+                        onChange={handleFreeRateChange}
                     />
                 </div>
             </div>
@@ -510,10 +668,71 @@ const EditorWrapper: React.FC = () => {
 
 const ShortStoryPublish: React.FC = () => {
     const [state, dispatch] = useReducer(editorReducer, {
-        title: ""
+        title: "",
+        content: "",
+        cover: "",
+        categoryIds: [],
+        freeRate: 50,
     })
+    const [submitting, setSubmitting] = useState(false);
+
+    // 保存草稿 - 不校验必填项
+    const submitDraft = useCallback(async () => {
+        if (submitting) return;
+
+        try {
+            setSubmitting(true);
+            await RCreateShortStoryDraft({
+                categoryIds: state.categoryIds,
+                content: state.content,
+                cover: state.cover,
+                toutiaoCover: state.cover,
+                freeRate: state.freeRate,
+                title: state.title.trim(),
+            });
+            Message.success('草稿保存成功');
+        } catch (error) {
+            console.error(error);
+            Message.error('保存失败，请稍后重试');
+        } finally {
+            setSubmitting(false);
+        }
+    }, [state, submitting]);
+
+    // 下一步/提交审核 - 需要完整校验
+    const submitForReview = useCallback(async () => {
+        if (submitting) return;
+
+        const title = state.title.trim();
+        const content = state.content.trim();
+
+        if (!title) {
+            Message.warning('请输入短故事名称');
+            return;
+        }
+        if (!content) {
+            Message.warning('请输入故事正文');
+            return;
+        }
+        if (content.length < 100) {
+            Message.warning('故事正文至少需要100字');
+            return;
+        }
+        if (!state.cover) {
+            Message.warning('请上传封面');
+            return;
+        }
+        if (!state.categoryIds.length) {
+            Message.warning('请选择作品分类');
+            return;
+        }
+
+        // TODO: 调用正式提交的 API
+        Message.info('校验通过，准备进入下一步');
+    }, [state, submitting]);
+
     return (
-        <StateContext.Provider value={{ state, dispatch }}>
+        <StateContext.Provider value={{ state, dispatch, submitDraft, submitForReview, submitting }}>
             <div style={{
                 height: '100vh',
                 background: '#FCFBFC',

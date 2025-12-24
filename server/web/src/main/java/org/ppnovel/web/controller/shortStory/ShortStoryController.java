@@ -8,10 +8,7 @@ import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.ppnovel.common.dto.common.PageResponse;
 import org.ppnovel.common.dto.common.Result;
-import org.ppnovel.common.dto.web.shortStory.CreateShortStory;
-import org.ppnovel.common.dto.web.shortStory.SelfShortStoryPageQuery;
-import org.ppnovel.common.dto.web.shortStory.ShortStoryDetailResponse;
-import org.ppnovel.common.dto.web.shortStory.SubmitReadingProgress;
+import org.ppnovel.common.dto.web.shortStory.*;
 import org.ppnovel.common.exception.BusinessException;
 import org.ppnovel.web.service.shortStory.ShortStoryService;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +31,12 @@ public class ShortStoryController {
         shortStoryService.createShortStory(createShortStory);
     }
 
+    @Operation(summary = "提交短故事为草稿")
+    @PostMapping("draft")
+    public void draftShortStory(@RequestBody @Validated CreateShortStoryDraft reqBody) {
+        shortStoryService.createShortStoryDraft(reqBody);
+    }
+
     @SaIgnore
     @Operation(summary = "获取短故事详情")
     @GetMapping("detail/{storyId}")
@@ -54,6 +57,12 @@ public class ShortStoryController {
         }
 
         return shortStoryService.getSelfShortPageData(pageQuery);
+    }
+
+    @Operation(summary =  "获取自己的短故事草稿-分页")
+    @PostMapping("self/draft-page")
+    public PageResponse<DraftPageRes> selfDraftPageQuery(@RequestBody @Validated DraftPageReq pageQuery) {
+        return  shortStoryService.getSelfDraftPageData(pageQuery);
     }
 
     @SaIgnore

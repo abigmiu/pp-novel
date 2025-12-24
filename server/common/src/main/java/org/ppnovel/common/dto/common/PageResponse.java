@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PageResponse {
+public class PageResponse<T> {
 
     private Long page;
     private Long size;
@@ -19,4 +19,6 @@ public class PageResponse {
         this.total = pageResult.getTotal();
         this.rows = pageResult.getRecords();
     }
+
+
 }
