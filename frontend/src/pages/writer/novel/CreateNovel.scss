@@ -1,0 +1,172 @@
+@use "../../../assets/_mixin.scss" as mixin;
+
+@include mixin.b("create-novel") {
+    padding: 10px;
+    background: #f8f8f8;
+    min-height: calc(100vh - 80px);
+
+    > .serial-card {
+        width: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+    }
+
+    @include mixin.e("header") {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+
+    @include mixin.e("back") {
+        font-size: 18px;
+        color: #1f2937;
+        padding: 0;
+    }
+
+    @include mixin.e("audit") {
+        color: #9ca3af;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    @include mixin.e("body") {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+    }
+
+    @include mixin.e("cover") {
+        width: 220px;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
+    @include mixin.e("cover-box") {
+        width: 200px;
+        height: 260px;
+        border-radius: 12px;
+        background: #f7f7f7;
+        border: 1px dashed #e5e5e5;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    @include mixin.e("cover-img") {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    @include mixin.e("cover-placeholder") {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, #f8f8f8 0%, #ededed 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    @include mixin.e("cover-title") {
+        font-size: 18px;
+        margin-bottom: 8px;
+        letter-spacing: 2px;
+    }
+
+    @include mixin.e("cover-subtitle") {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    @include mixin.e("form") {
+        flex: 1;
+        min-width: 0;
+    }
+
+    @include mixin.e("row") {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 18px;
+    }
+
+    @include mixin.e("label") {
+        width: 92px;
+        font-size: 14px;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding-top: 4px;
+    }
+
+    @include mixin.e("required") {
+        color: #ff5f00;
+        margin-right: 4px;
+    }
+
+    @include mixin.e("field") {
+        flex: 1;
+        min-width: 0;
+    }
+
+    @include mixin.e("input-wrap") {
+        position: relative;
+        max-width: 540px;
+
+        .arco-input,
+        .arco-select {
+            padding-right: 80px;
+        }
+    }
+
+    @include mixin.e("limit") {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 12px;
+    }
+
+    @include mixin.e("tags") {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    @include mixin.e("protagonist-row") {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    @include mixin.e("textarea-wrap") {
+        max-width: 720px;
+
+        .arco-textarea {
+            padding-right: 12px;
+        }
+    }
+
+    @include mixin.e("textarea-tip") {
+        margin-top: 6px;
+        display: block;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    @include mixin.e("footer") {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 12px;
+    }
+}
