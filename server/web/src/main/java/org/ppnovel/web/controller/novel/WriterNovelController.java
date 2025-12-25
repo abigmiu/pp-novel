@@ -6,10 +6,7 @@ import org.ppnovel.common.dto.web.novel.writer.CreateNovelReq;
 import org.ppnovel.common.dto.web.novel.writer.CreateNovelRes;
 import org.ppnovel.web.service.novel.WriterNovelService;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "小说-作家")
 @RestController()
@@ -28,5 +25,11 @@ public class WriterNovelController {
     @PostMapping("create")
     public CreateNovelRes createNovel(@RequestBody @Validated CreateNovelReq req) {
         return writerNovelService.createNovel(req);
+    }
+
+    @Operation(summary = "删除小说")
+    @DeleteMapping("delete")
+    public void deleteNovel(@RequestParam Integer id) {
+        writerNovelService.deleteNovel(id);
     }
 }

@@ -6,6 +6,7 @@ import org.ppnovel.common.dto.web.novel.writer.CreateNovelReq;
 import org.ppnovel.common.dto.web.novel.writer.CreateNovelRes;
 import org.ppnovel.common.entity.novel.NovelEntity;
 import org.ppnovel.common.entity.novel.NovelRelateCategoryEntity;
+import org.ppnovel.common.exception.BusinessException;
 import org.ppnovel.common.mapper.novel.NovelMapper;
 import org.ppnovel.common.mapper.novel.NovelRelateCategoryMapper;
 import org.ppnovel.web.util.SaTokenUtil;
@@ -54,6 +55,21 @@ public class WriterNovelService {
         CreateNovelRes res = new CreateNovelRes();
         res.setNovelId(novelId);
         return res;
+    }
+
+    @Transactional
+    public void deleteNovel(Integer novelId) {
+        Integer authorId = SaTokenUtil.getUserId();
+        LambdaQueryWrapper<NovelEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(NovelEntity::getId, novelId);
+        queryWrapper.eq(NovelEntity::getAuthorId, authorId);
+        NovelEntity novelEntity = novelMapper.selectOne(queryWrapper);
+        if (novelEntity == null) {
+            throw new BusinessException("novel not exit");
+        }
+
+//        deleteNovelRelateCategories(novelId);
+        novelMapper.deleteById(novelId);
     }
 
     private void deleteNovelRelateCategories(Integer novelId) {
