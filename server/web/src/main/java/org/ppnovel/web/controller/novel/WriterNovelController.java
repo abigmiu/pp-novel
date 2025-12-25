@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.ppnovel.common.dto.web.novel.writer.CreateNovelReq;
 import org.ppnovel.common.dto.web.novel.writer.CreateNovelRes;
+import org.ppnovel.common.dto.web.novel.writer.UpdateNovelReq;
 import org.ppnovel.web.service.novel.WriterNovelService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,5 +32,11 @@ public class WriterNovelController {
     @DeleteMapping("delete")
     public void deleteNovel(@RequestParam Integer id) {
         writerNovelService.deleteNovel(id);
+    }
+
+    @Operation(summary = "更新小说")
+    @PutMapping("update")
+    public void updateNovel(@RequestBody @Validated UpdateNovelReq req) {
+        writerNovelService.updateNovel(req);
     }
 }

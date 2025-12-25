@@ -1,9 +1,11 @@
 package org.ppnovel.web.service.novel;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.ppnovel.common.constant.NovelStatus;
 import org.ppnovel.common.dto.web.novel.writer.CreateNovelReq;
 import org.ppnovel.common.dto.web.novel.writer.CreateNovelRes;
+import org.ppnovel.common.dto.web.novel.writer.UpdateNovelReq;
 import org.ppnovel.common.entity.novel.NovelEntity;
 import org.ppnovel.common.entity.novel.NovelRelateCategoryEntity;
 import org.ppnovel.common.exception.BusinessException;
@@ -55,6 +57,39 @@ public class WriterNovelService {
         CreateNovelRes res = new CreateNovelRes();
         res.setNovelId(novelId);
         return res;
+    }
+
+    @Transactional
+    public void updateNovel(UpdateNovelReq req) {
+        Integer authorId = SaTokenUtil.getUserId();
+        Integer novelId = req.getId();
+        LambdaQueryWrapper<NovelEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(NovelEntity::getId, novelId);
+        queryWrapper.eq(NovelEntity::getAuthorId, authorId);
+        NovelEntity novelEntity = novelMapper.selectOne(queryWrapper);
+        if (novelEntity == null) {
+            throw new BusinessException("novel not exit");
+        }
+
+        LambdaUpdateWrapper<NovelEntity>  updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(NovelEntity::getId, novelEntity.getId());
+        updateWrapper.eq(NovelEntity::getAuthorId, authorId);
+        updateWrapper.set(NovelEntity::getTitle, req.getTitle());
+        updateWrapper.set(NovelEntity::getType, req.getType());
+        updateWrapper.set(NovelEntity::getCover, req.getCover());
+        updateWrapper.set(NovelEntity::getProtagonist1, req.getProtagonist1());
+        updateWrapper.set(NovelEntity::getProtagonist2, req.getProtagonist2());
+        updateWrapper.set(NovelEntity::getDescription, req.getDescription());
+
+
+
+        novelMapper.update(null, updateWrapper);
+
+        deleteNovelRelateCategories(novelEntity.getId());
+        insertNovelRelateCategories(novelId, req.getCategoryIds(), 1);
+        insertNovelRelateCategories(novelId, req.getThemeIds(), 2);
+        insertNovelRelateCategories(novelId, req.getRoleIds(), 3);
+        insertNovelRelateCategories(novelId, req.getPlotIds(), 4);
     }
 
     @Transactional
