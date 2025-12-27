@@ -1,0 +1,201 @@
+@use "../../../assets/_mixin.scss" as mixin;
+
+@include mixin.b("create-chapter") {
+    padding: 10px;
+    background: #f8f8f8;
+    min-height: calc(100vh - 80px);
+
+    @include mixin.e("sheet") {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+        padding: 24px;
+        min-height: calc(100vh - 120px);
+    }
+
+    @include mixin.e("header") {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    @include mixin.e("breadcrumb") {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        color: #1f2937;
+        flex-wrap: wrap;
+    }
+
+    @include mixin.e("book-title") {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    @include mixin.e("volume-tag") {
+        padding: 2px 10px;
+        background: #f3f4f6;
+        border-radius: 999px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    @include mixin.e("id-tag") {
+        color: #9ca3af;
+        font-size: 12px;
+    }
+
+    @include mixin.e("header-actions") {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #6b7280;
+        font-size: 13px;
+        flex-wrap: wrap;
+
+        .arco-btn {
+            border-radius: 999px;
+        }
+    }
+
+    @include mixin.e("meta-row") {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        color: #6b7280;
+        flex-wrap: wrap;
+    }
+
+    @include mixin.e("meta-label") {
+        color: #374151;
+        font-size: 14px;
+    }
+
+    @include mixin.e("meta-input") {
+        width: 160px;
+    }
+
+    @include mixin.e("body") {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+    }
+
+    @include mixin.e("editor-panel") {
+        flex: 1;
+        min-width: 0;
+    }
+
+    @include mixin.e("title-row") {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-size: 18px;
+        color: #4b5563;
+    }
+
+    @include mixin.e("chapter-input") {
+        width: 90px;
+    }
+
+    @include mixin.e("title-input") {
+        flex: 1;
+    }
+
+    @include mixin.e("chapter-label") {
+        color: #6b7280;
+    }
+
+    @include mixin.e("hint") {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #9ca3af;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    @include mixin.e("content") {
+        background: linear-gradient(180deg, #fafafa 0%, #f8f8f8 100%);
+        border: 1px solid #f0f0f0;
+        border-radius: 12px;
+        padding: 8px;
+        position: relative;
+
+        .pm-editor {
+            min-height: 420px;
+            font-size: 15px;
+            line-height: 1.6;
+            outline: none;
+            caret-color: #ff5f00;
+        }
+    }
+
+    @include mixin.e("aside") {
+        width: 78px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        position: sticky;
+        top: 12px;
+    }
+
+    @include mixin.e("aside-btn") {
+        justify-content: center;
+        color: #4b5563;
+        background: #f9fafb;
+        border-color: #f3f4f6;
+    }
+
+    @include mixin.e("aside-btn-icon") {
+        margin-bottom: 4px;
+        font-size: 18px;
+    }
+
+    @include mixin.e("remark-card") {
+        margin-top: 16px;
+        border: 1px solid #f3f4f6;
+        border-radius: 12px;
+        padding: 16px;
+        background: #fffaf5;
+    }
+
+    @include mixin.e("remark-header") {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #374151;
+    }
+
+    @include mixin.e("remark-tip") {
+        margin-top: 6px;
+        display: block;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+}
+
+.pm-placeholder {
+    pointer-events: none;
+    color: #999;
+    white-space: pre-wrap;
+    display: block;
+    line-height: 1.2;
+    user-select: none;
+    font-size: 13px;
+    position: absolute;
+    padding: 12px;
+}
+
+.pm-placeholder::before {
+    content: "";
+    display: block;
+    height: 0;
+}

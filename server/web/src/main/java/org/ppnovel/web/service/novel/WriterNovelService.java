@@ -3,33 +3,37 @@ package org.ppnovel.web.service.novel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.ppnovel.common.constant.NovelStatus;
-import org.ppnovel.common.dto.web.novel.writer.CreateNovelReq;
-import org.ppnovel.common.dto.web.novel.writer.CreateNovelRes;
-import org.ppnovel.common.dto.web.novel.writer.UpdateNovelReq;
+import org.ppnovel.common.dto.web.novel.writer.*;
+import org.ppnovel.common.entity.novel.NovelChapterEntity;
 import org.ppnovel.common.entity.novel.NovelEntity;
 import org.ppnovel.common.entity.novel.NovelRelateCategoryEntity;
 import org.ppnovel.common.exception.BusinessException;
+import org.ppnovel.common.mapper.novel.NovelChapterMapper;
 import org.ppnovel.common.mapper.novel.NovelMapper;
 import org.ppnovel.common.mapper.novel.NovelRelateCategoryMapper;
 import org.ppnovel.web.util.SaTokenUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class WriterNovelService {
+    private final NovelChapterMapper novelChapterMapper;
     private  NovelMapper novelMapper;
     private NovelRelateCategoryMapper novelRelateCategoryMapper;
 
 
     public  WriterNovelService(
         NovelMapper novelMapper,
-        NovelRelateCategoryMapper novelRelateCategoryMapper
-    ) {
+        NovelRelateCategoryMapper novelRelateCategoryMapper,
+        NovelChapterMapper novelChapterMapper) {
         this.novelMapper = novelMapper;
         this.novelRelateCategoryMapper = novelRelateCategoryMapper;
+        this.novelChapterMapper = novelChapterMapper;
     };
 
     @Transactional
@@ -105,6 +109,47 @@ public class WriterNovelService {
 
 //        deleteNovelRelateCategories(novelId);
         novelMapper.deleteById(novelId);
+    }
+
+
+    public List<WriterSelfNovelListRes> getNovelList() {
+        Integer authorId = SaTokenUtil.getUserId();
+        LambdaQueryWrapper<NovelEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(NovelEntity::getAuthorId, authorId);
+
+        List<NovelEntity> novelEntities = novelMapper.selectList(queryWrapper);
+        List<WriterSelfNovelListRes> resList = new ArrayList<WriterSelfNovelListRes>();
+        novelEntities.forEach(novelEntity -> {
+            WriterSelfNovelListRes resItem =  new WriterSelfNovelListRes();
+            resItem.setId(novelEntity.getId());
+            resItem.setTitle(novelEntity.getTitle());
+            resItem.setCover(novelEntity.getCover());
+            resItem.setStatus(novelEntity.getStatus());
+            Integer totalWordCount = novelChapterMapper.sumContentLength(novelEntity.getId());
+            resItem.setTotalWordCount(Optional.ofNullable(totalWordCount).orElse(0));
+            Integer totalChapter = novelChapterMapper.chapterCount(novelEntity.getId());
+            resItem.setTotalChapterCount(Optional.ofNullable(totalChapter).orElse(0));
+
+            if (totalChapter > 0) {
+                LambdaQueryWrapper<NovelChapterEntity> novelChapterQueryWrapper = new LambdaQueryWrapper<>();
+                novelChapterQueryWrapper.eq(NovelChapterEntity::getBookId, novelEntity.getId());
+                novelChapterQueryWrapper.orderByDesc(NovelChapterEntity::getChapterIdx);
+                novelChapterQueryWrapper.last("limit 1");
+
+                NovelChapterEntity novelChapterEntity = novelChapterMapper.selectOne(novelChapterQueryWrapper);
+                if (novelChapterEntity != null) {
+                    WriterSelfNovelListRes.NewestChapter newestChapter = new WriterSelfNovelListRes.NewestChapter();
+                    newestChapter.setId(novelChapterEntity.getId());
+                    newestChapter.setTitle(novelChapterEntity.getTitle());
+                    newestChapter.setIdx(novelChapterEntity.getChapterIdx());
+                    resItem.setNewestChapter(newestChapter);
+                }
+            }
+
+            resList.add(resItem);
+        });
+
+        return  resList;
     }
 
     private void deleteNovelRelateCategories(Integer novelId) {

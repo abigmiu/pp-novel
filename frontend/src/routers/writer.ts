@@ -1,6 +1,8 @@
 import WriterLayout from "@/components/writer/WriterLayout";
 import WriteHomePage from "@/pages/writer/home/WriteHome";
 import CreateNovel from "@/pages/writer/novel/CreateNovel";
+import CreateChapter from "@/pages/writer/novel/CreateChapter";
+import NovelList from "@/pages/writer/novel/NovelList";
 import MyShortStory from "@/pages/writer/shortStory/MyShortStory";
 import DraftList from "@/pages/writer/shortStory/DraftList";
 import ShortStoryPublish from "@/pages/writer/write/ShortStory";
@@ -26,6 +28,14 @@ const writerRoutes: RouteObject[] = [
             {
                 path: 'novel/create',
                 Component: CreateNovel,
+            },
+            {
+                path: 'novel/list',
+                Component: NovelList,
+            },
+            {
+                path: 'novel/chapter/create',
+                Component: CreateChapter,
             }
         ]
     },

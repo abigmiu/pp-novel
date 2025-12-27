@@ -36,7 +36,7 @@ const LayoutMenu: React.FC = () => {
             </div>
 
             <div className={`${ns.e('sub-menu')}`}>
-                <div className={`${ns.e('menu-item')}`}>
+                <div className={`${ns.e('menu-item')}`} onClick={() => navigate('/writer/novel/list')}>
                     <div className={`${ns.e('menu-item-icon')}`}>
                         {/* <img src="data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PHBhdGggZD0iTTgzMiA3Njh2NjRhNjQgNjQgMCAwIDEtNjQgNjRIMjU2YTY0IDY0IDAgMCAxIDAtMTI4aDU3Nm02NC02NEgyNTZhMTI4IDEyOCAwIDAgMCAwIDI1Nmg1MTJhMTI4IDEyOCAwIDAgMCAxMjgtMTI4VjcwNHoiIGZpbGw9IiM3MDcwNzAiLz48cGF0aCBkPSJNNzE1LjMwNyA2NEgzMDguNjkzQzIwOC45MDcgNjQgMTI4IDEzNi4zNzMgMTI4IDIyNS42djYwMS4wNjdsNjQtMzEuNDY3VjIyNS42YzAtNTMuODEzIDUyLjM3My05Ny42IDExNi42OTMtOTcuNmg0MDYuNjE0Qzc3OS42MjcgMTI4IDgzMiAxNzEuNzg3IDgzMiAyMjUuNnY1NDUuNDkzaDY0VjIyNS42Qzg5NiAxMzYuMzczIDgxNS4wOTMgNjQgNzE1LjMwNyA2NHoiIGZpbGw9IiM3MDcwNzAiLz48L3N2Zz4=" alt="" /> */}
                     </div>
