@@ -11,6 +11,8 @@ import org.ppnovel.common.mapper.novel.NovelChapterMapper;
 import org.ppnovel.web.util.SaTokenUtil;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class WriterChapterService {
 
@@ -51,6 +53,7 @@ public class WriterChapterService {
         entity.setContent(req.getContent());
         entity.setStatus(NovelChapterStatus.PENDING_CHECK);
         entity.setAuthorRemark(req.getAuthorRemark());
+        entity.setPrice(req.getPrice() == null ? BigDecimal.ZERO : req.getPrice());
         chapterMapper.insert(entity);
     }
 }

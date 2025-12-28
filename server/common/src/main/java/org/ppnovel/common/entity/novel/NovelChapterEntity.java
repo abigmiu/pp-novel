@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @TableName("novel_chapter")
 public class NovelChapterEntity {
@@ -33,4 +35,7 @@ public class NovelChapterEntity {
 
     @TableField("status")
     private Integer status;
+
+    @TableField("price")
+    private BigDecimal price;
 }

@@ -30,6 +30,7 @@ function LoginedCmp() {
     const userInfo = useUserStore((s) => s.userInfo)!;
     const logout = useUserStore((s) => s.logout);
     const ns = useNamespace('layout-header-userinfo')
+    const navigate = useNavigate();
     return (
         <Popover
             title={''}
@@ -38,6 +39,9 @@ function LoginedCmp() {
                 <div className={ ns.e('popover') } style={{
                     fontSize: '16px'
                 }}>
+                    <div className="mb-2 cursor-pointer" onClick={() => navigate('/wallet')}>
+                        <span className="ml-2">我的钱包</span>
+                    </div>
                     <div className="mb-2 cursor-pointer">
                         <IconSettings />
                         <span className="ml-2">账号设置</span>

@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class CreateChapterReq {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "标题")
@@ -19,4 +21,7 @@ public class CreateChapterReq {
     private String authorRemark;
 
     private Integer bookId;
+
+    @Schema(description = "价格，单位元，默认0为免费")
+    private BigDecimal price;
 }

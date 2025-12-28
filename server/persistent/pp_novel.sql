@@ -117,4 +117,107 @@ CREATE TABLE `writer` (
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='作家数据';
 
+-- ----------------------------
+-- Table structure for wallet
+-- ----------------------------
+DROP TABLE IF EXISTS `wallet`;
+CREATE TABLE `wallet` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `balance` decimal(18,2) NOT NULL DEFAULT 0,
+  `total_recharge` decimal(18,2) NOT NULL DEFAULT 0,
+  `total_consume` decimal(18,2) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `is_delete` tinyint NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_wallet_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户钱包';
+
+-- ----------------------------
+-- Table structure for wallet_txn
+-- ----------------------------
+DROP TABLE IF EXISTS `wallet_txn`;
+CREATE TABLE `wallet_txn` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `type` varchar(32) NOT NULL COMMENT 'RECHARGE/CONSUME/ADJUST',
+  `direction` varchar(8) NOT NULL COMMENT 'IN/OUT',
+  `amount` decimal(18,2) NOT NULL,
+  `balance_after` decimal(18,2) NOT NULL,
+  `biz_id` bigint DEFAULT NULL,
+  `biz_type` varchar(32) DEFAULT NULL,
+  `request_id` varchar(64) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `is_delete` tinyint NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `idx_txn_user_time` (`user_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='钱包流水';
+
+-- ----------------------------
+-- Table structure for recharge_order
+-- ----------------------------
+DROP TABLE IF EXISTS `recharge_order`;
+CREATE TABLE `recharge_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(64) NOT NULL,
+  `user_id` int NOT NULL,
+  `amount` decimal(18,2) NOT NULL,
+  `status` tinyint NOT NULL COMMENT '0待处理 1成功 2失败',
+  `channel` varchar(32) DEFAULT NULL,
+  `request_id` varchar(64) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `is_delete` tinyint NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_recharge_request` (`request_id`),
+  KEY `idx_recharge_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='充值订单';
+
+-- ----------------------------
+-- Table structure for consume_order
+-- ----------------------------
+DROP TABLE IF EXISTS `consume_order`;
+CREATE TABLE `consume_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(64) NOT NULL,
+  `user_id` int NOT NULL,
+  `amount` decimal(18,2) NOT NULL,
+  `status` tinyint NOT NULL,
+  `biz_scene` varchar(32) NOT NULL COMMENT 'CHAPTER/REWARD/VOTE',
+  `target_id` int NOT NULL COMMENT '章节/目标ID',
+  `request_id` varchar(64) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `is_delete` tinyint NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_consume_request` (`request_id`),
+  UNIQUE KEY `uk_consume_target` (`user_id`,`target_id`,`biz_scene`),
+  KEY `idx_consume_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='消费订单';
+
+-- ----------------------------
+-- Table structure for chapter_access
+-- ----------------------------
+DROP TABLE IF EXISTS `chapter_access`;
+CREATE TABLE `chapter_access` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `chapter_id` int NOT NULL,
+  `grant_type` varchar(32) NOT NULL COMMENT 'PURCHASE/FREE/ACTIVITY',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `is_delete` tinyint NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_access_user_chapter` (`user_id`,`chapter_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='章节授权';
+
+-- ----------------------------
+-- Column updates for novel_chapter
+-- ----------------------------
+ALTER TABLE `novel_chapter`
+ADD COLUMN IF NOT EXISTS `price` decimal(18,2) NOT NULL DEFAULT 0 COMMENT '章节价格';
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -15,6 +15,7 @@ import org.ppnovel.common.mapper.UserMapper;
 import org.ppnovel.common.mapper.WriterStatMapper;
 import org.ppnovel.common.utils.EncryptUtil;
 import org.ppnovel.web.component.RedisUtil;
+import org.ppnovel.web.service.pay.WalletService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,17 +29,20 @@ public class AuthService {
     private final UserMapper userMapper;
     private final WriterStatMapper writerStatMapper;
     private final RedisUtil redisUtil;
+    private final WalletService walletService;
 
     public AuthService(
         UserMapper userMapper,
         RedisUtil redisUtil,
         WriterStatMapper writerStatMapper,
-        FansFollowMapper fansFollowMapper
+        FansFollowMapper fansFollowMapper,
+        WalletService walletService
     ) {
         this.writerStatMapper = writerStatMapper;
         this.userMapper = userMapper;
         this.redisUtil = redisUtil;
         this.fansFollowMapper = fansFollowMapper;
+        this.walletService = walletService;
     }
 
     /**
@@ -93,6 +97,7 @@ public class AuthService {
 
         UserEntity newUser = createNewUser(body);
         userMapper.insert(newUser);
+        walletService.createWalletIfAbsent(newUser.getId());
 
         initWriterData(newUser.getId());
 

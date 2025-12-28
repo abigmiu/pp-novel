@@ -1,0 +1,62 @@
+@use "../../../assets/_mixin.scss" as mixin;
+
+@include mixin.b('wallet') {
+    padding-top: 12px;
+
+    @include mixin.e('grid') {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    @include mixin.e('card') {
+        height: 100%;
+    }
+
+    @include mixin.e('balance') {
+        margin: 12px 0 4px 0;
+        font-weight: 600;
+    }
+
+    @include mixin.e('sub') {
+        color: #666;
+        font-size: 14px;
+    }
+
+    @include mixin.e('quick') {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    @include mixin.e('input') {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 10px;
+
+        .arco-input-number {
+            flex: 1;
+        }
+    }
+
+    @include mixin.e('tips') {
+        color: #888;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @include mixin.e('amount') {
+        &--in {
+            color: #0d8a62;
+            font-weight: 600;
+        }
+
+        &--out {
+            color: #d4380d;
+            font-weight: 600;
+        }
+    }
+}
