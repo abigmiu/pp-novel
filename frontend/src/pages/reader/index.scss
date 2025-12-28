@@ -1,0 +1,254 @@
+@use "../../assets/_mixin.scss" as mixin;
+
+@include mixin.b('reader-index') {
+    padding-top: 4px;
+
+    @include mixin.e('filters') {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    @include mixin.e('filter-row') {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 0;
+        flex-wrap: wrap;
+    }
+
+    @include mixin.e('filter-label') {
+        width: 56px;
+        flex-shrink: 0;
+        color: #888;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    @include mixin.e('filter-options') {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    @include mixin.e('chip') {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: #f7f8fb;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
+
+        &:hover {
+            color: rgb(var(--primary-6));
+            box-shadow: inset 0 0 0 1px rgba(255, 95, 0, 0.15);
+        }
+
+        &.is-active {
+            color: #fff;
+            background: var(--primary-linear-gradient);
+            box-shadow: 0 6px 14px rgba(255, 95, 0, 0.2);
+        }
+    }
+
+    @include mixin.e('category-panel') {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+        padding-left: 56px;
+    }
+
+    @include mixin.e('category-chip') {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 22px;
+        background: #f7f8fb;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+        cursor: pointer;
+        transition: all 0.18s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        &.is-active {
+            background: linear-gradient(135deg, #fff2e8, #ffe3d3);
+            box-shadow: 0 10px 20px rgba(255, 132, 80, 0.16);
+        }
+    }
+
+    @include mixin.e('category-icon') {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #ffd5b0, #ffa160 70%, #ff7c3a);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    }
+
+    @include mixin.e('category-text') {
+        color: #444;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    @include mixin.e('tabs') {
+        display: flex;
+        gap: 28px;
+        margin: 12px 0 18px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #f1f2f5;
+    }
+
+    @include mixin.e('tab') {
+        position: relative;
+        padding: 8px 4px;
+        cursor: pointer;
+        color: #666;
+        font-weight: 500;
+        transition: all 0.2s ease;
+
+        &:hover {
+            color: rgb(var(--primary-6));
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -7px;
+            height: 2px;
+            background: transparent;
+            transition: background 0.2s ease;
+        }
+
+        &.is-active {
+            color: rgb(var(--primary-6));
+            font-weight: 600;
+
+            &::after {
+                background: var(--primary-linear-gradient);
+            }
+        }
+    }
+
+    @include mixin.e('list') {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 18px;
+    }
+
+    @include mixin.e('card') {
+        display: flex;
+        gap: 14px;
+        padding: 14px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #fff 0%, #fdf7f2 100%);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    @include mixin.e('cover') {
+        width: 104px;
+        height: 140px;
+        flex-shrink: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #f2f2f2;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    @include mixin.e('cover-placeholder') {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        color: #888;
+        background: linear-gradient(145deg, #f6f6f6, #ededed);
+        font-weight: 600;
+    }
+
+    @include mixin.e('content') {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    @include mixin.e('title-row') {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    @include mixin.e('title') {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f1f1f;
+        line-height: 1.2;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @include mixin.e('status') {
+        padding: 4px 10px;
+        border-radius: 12px;
+        background: #fff4ec;
+        color: rgb(var(--primary-6));
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    @include mixin.e('meta') {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        color: #666;
+        font-size: 13px;
+    }
+
+    @include mixin.e('latest') {
+        color: rgb(var(--primary-6));
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    @include mixin.e('desc') {
+        color: #444;
+        font-size: 13px;
+        line-height: 1.6;
+        max-height: 44px;
+        overflow: hidden;
+    }
+
+    @include mixin.e('empty') {
+        padding: 80px 0;
+    }
+
+    @include mixin.e('pagination') {
+        margin-top: 18px;
+        display: flex;
+        justify-content: center;
+    }
+}

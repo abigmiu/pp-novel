@@ -220,4 +220,17 @@ CREATE TABLE `chapter_access` (
 ALTER TABLE `novel_chapter`
 ADD COLUMN IF NOT EXISTS `price` decimal(18,2) NOT NULL DEFAULT 0 COMMENT '章节价格';
 
+-- Column updates for novel
+ALTER TABLE `novel`
+ADD COLUMN IF NOT EXISTS `word_count` int NOT NULL DEFAULT 0 COMMENT '小说总字数';
+
+-- Backfill novel word count using existing章节内容
+UPDATE `novel` n
+LEFT JOIN (
+    SELECT book_id, IFNULL(SUM(CHAR_LENGTH(content)), 0) AS sum_length
+    FROM novel_chapter
+    GROUP BY book_id
+) c ON c.book_id = n.id
+SET n.word_count = IFNULL(c.sum_length, 0);
+
 SET FOREIGN_KEY_CHECKS = 1;

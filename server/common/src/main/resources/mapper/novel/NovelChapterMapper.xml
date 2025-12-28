@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ppnovel.common.mapper.novel.NovelChapterMapper">
+
+
+    <select id="getNovelCatalog" resultType="org.ppnovel.common.dto.web.novel.NovelCatelogRes">
+        SELECT
+            ch.title                                          AS title,
+            ch.id                                             AS chapterId,
+            CASE WHEN ch.price IS NOT NULL AND ch.price > 0 THEN TRUE ELSE FALSE END AS feeable,
+            CASE WHEN ca.id IS NOT NULL THEN TRUE ELSE FALSE END                      AS paied,
+            ch.chapter_idx                                   AS idx
+        FROM novel_chapter ch
+                 LEFT JOIN chapter_access ca
+                           ON ca.chapter_id = ch.id
+                               AND ca.user_id = #{userId}
+        <where>
+            ch.book_id = #{novelId}
+            AND (ch.is_delete = 0 OR ch.is_delete IS NULL)
+        </where>
+        ORDER BY ch.chapter_idx ASC
+    </select>
+</mapper>

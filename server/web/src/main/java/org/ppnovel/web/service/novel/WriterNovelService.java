@@ -49,6 +49,7 @@ public class WriterNovelService {
         novelEntity.setProtagonist2(req.getProtagonist2());
         novelEntity.setDescription(req.getDescription());
         novelEntity.setStatus(NovelStatus.PENDING_CHECK);
+        novelEntity.setWordCount(0);
 
         novelMapper.insert(novelEntity);
         Integer novelId = novelEntity.getId();
@@ -125,8 +126,9 @@ public class WriterNovelService {
             resItem.setTitle(novelEntity.getTitle());
             resItem.setCover(novelEntity.getCover());
             resItem.setStatus(novelEntity.getStatus());
-            Integer totalWordCount = novelChapterMapper.sumContentLength(novelEntity.getId());
-            resItem.setTotalWordCount(Optional.ofNullable(totalWordCount).orElse(0));
+            Integer totalWordCount = Optional.ofNullable(novelEntity.getWordCount())
+                .orElseGet(() -> Optional.ofNullable(novelChapterMapper.sumContentLength(novelEntity.getId())).orElse(0));
+            resItem.setTotalWordCount(totalWordCount);
             Integer totalChapter = novelChapterMapper.chapterCount(novelEntity.getId());
             resItem.setTotalChapterCount(Optional.ofNullable(totalChapter).orElse(0));
 

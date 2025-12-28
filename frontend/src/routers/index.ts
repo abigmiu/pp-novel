@@ -15,6 +15,10 @@ const router = createBrowserRouter([
                 Component: ReaderIndex,
             },
             {
+                path: '/reader',
+                Component: ReaderIndex,
+            },
+            {
                 path: '/wallet',
                 Component: WalletPage,
             }

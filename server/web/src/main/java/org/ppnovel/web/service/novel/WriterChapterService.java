@@ -1,25 +1,33 @@
 package org.ppnovel.web.service.novel;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.apache.coyote.BadRequestException;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.ppnovel.common.constant.NovelChapterStatus;
 import org.ppnovel.common.dto.web.novel.chapter.CreateChapterReq;
 import org.ppnovel.common.entity.novel.NovelChapterEntity;
+import org.ppnovel.common.entity.novel.NovelEntity;
 import org.ppnovel.common.exception.BusinessException;
 import org.ppnovel.common.mapper.novel.NovelChapterMapper;
+import org.ppnovel.common.mapper.novel.NovelMapper;
 import org.ppnovel.web.util.SaTokenUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 public class WriterChapterService {
 
     private final NovelChapterMapper chapterMapper;
+    private final NovelMapper novelMapper;
 
-    public WriterChapterService(NovelChapterMapper chapterMapper) {
+    public WriterChapterService(
+        NovelChapterMapper chapterMapper,
+        NovelMapper novelMapper
+    ) {
         this.chapterMapper = chapterMapper;
+        this.novelMapper = novelMapper;
     }
 
     public Integer getBookMaxIdx(Integer authorId, Integer bookId) {
@@ -36,14 +44,26 @@ public class WriterChapterService {
         return ((Number) obj).intValue();
     }
 
+    @Transactional
     public void createChapter(CreateChapterReq req) {
-        // TODO: 检查书本和作者是否一致
         Integer authorId = SaTokenUtil.getUserId();
+        NovelEntity novel = novelMapper.selectOne(new LambdaQueryWrapper<NovelEntity>()
+            .eq(NovelEntity::getId, req.getBookId())
+            .eq(NovelEntity::getAuthorId, authorId)
+            .select(NovelEntity::getId, NovelEntity::getAuthorId)
+        );
+        if (novel == null) {
+            throw new BusinessException("小说不存在或无权限");
+        }
+
         Integer maxIdx = getBookMaxIdx(authorId, req.getBookId());
         if (maxIdx + 1 != req.getChapterIdx()) {
             throw new BusinessException("max chapter idx is " + maxIdx);
         }
 
+        int contentLength = Optional.ofNullable(req.getContent())
+            .map(String::length)
+            .orElse(0);
 
         NovelChapterEntity  entity = new NovelChapterEntity();
         entity.setAuthorId(authorId);
@@ -55,5 +75,11 @@ public class WriterChapterService {
         entity.setAuthorRemark(req.getAuthorRemark());
         entity.setPrice(req.getPrice() == null ? BigDecimal.ZERO : req.getPrice());
         chapterMapper.insert(entity);
+
+        LambdaUpdateWrapper<NovelEntity> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(NovelEntity::getId, req.getBookId());
+        updateWrapper.eq(NovelEntity::getAuthorId, authorId);
+        updateWrapper.setSql("word_count = word_count + " + contentLength);
+        novelMapper.update(null, updateWrapper);
     }
 }

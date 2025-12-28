@@ -43,4 +43,8 @@ public class NovelEntity extends BaseEntity {
 
     @TableField("status")
     private Integer status;
+
+    /** 小说总字数 */
+    @TableField("word_count")
+    private Integer wordCount;
 }

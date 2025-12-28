@@ -145,6 +145,7 @@ const CreateChapter: React.FC = () => {
     const [title, setTitle] = useState<string>("");
     const [content, setContent] = useState<string>("");
     const [authorRemark, setAuthorRemark] = useState<string>("");
+    const [price, setPrice] = useState<number>(0);
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [saving, setSaving] = useState<boolean>(false);
     const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
@@ -165,6 +166,7 @@ const CreateChapter: React.FC = () => {
             if (typeof parsed.title === "string") setTitle(parsed.title);
             if (typeof parsed.content === "string") setContent(parsed.content);
             if (typeof parsed.authorRemark === "string") setAuthorRemark(parsed.authorRemark);
+            if (typeof parsed.price === "number") setPrice(parsed.price);
             if (typeof parsed.savedAt === "string") setLastSavedAt(parsed.savedAt);
         } catch (error) {
             console.warn("failed to parse chapter draft", error);
@@ -180,6 +182,7 @@ const CreateChapter: React.FC = () => {
             title,
             content,
             authorRemark,
+            price,
             savedAt,
         };
         try {
@@ -208,11 +211,14 @@ const CreateChapter: React.FC = () => {
             return;
         }
 
+        const normalizedPrice = Number.isFinite(price) ? Math.max(0, Number(price.toFixed(2))) : 0;
+
         const payload: IRCreateChapterReq = {
             title: title.trim(),
             chapterIdx: Math.max(1, Math.floor(chapterIdx)),
             ...(content.trim() ? { content: content.trim() } : {}),
             ...(authorRemark.trim() ? { authorRemark: authorRemark.trim() } : {}),
+            price: normalizedPrice,
             bookId,
         };
 
@@ -296,6 +302,21 @@ const CreateChapter: React.FC = () => {
                                 allowClear
                                 className={ns.e("title-input")}
                             />
+                        </div>
+                        <div className={ns.e("meta-row")}>
+                            <span className={ns.e("meta-label")}>收费金额</span>
+                            <InputNumber
+                                min={0}
+                                max={9999}
+                                step={0.1}
+                                precision={2}
+                                prefix="￥"
+                                placeholder="0 表示免费"
+                                value={price}
+                                onChange={(val) => setPrice(typeof val === "number" ? val : 0)}
+                                className={ns.e("meta-input")}
+                            />
+                            <Text type="secondary">单章金额，0 为免费章节</Text>
                         </div>
                         <div className={ns.e("hint")}>
                             <IconInfoCircle />

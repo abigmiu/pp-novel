@@ -1,13 +1,20 @@
 package org.ppnovel.web.service.novel;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import org.apache.coyote.BadRequestException;
+import org.ppnovel.common.dto.common.PageResponse;
+import org.ppnovel.common.dto.web.novel.NovelCatelogRes;
+import org.ppnovel.common.dto.web.novel.NovelPageListReq;
+import org.ppnovel.common.dto.web.novel.NovelPageListRes;
 import org.ppnovel.common.dto.web.novel.common.NovelCategoryRes;
 import org.ppnovel.common.entity.novel.NovelCategoryEntity;
 import org.ppnovel.common.exception.BusinessException;
 import org.ppnovel.common.mapper.novel.NovelCategoryMapper;
+import org.ppnovel.common.mapper.novel.NovelMapper;
+import org.ppnovel.common.mapper.novel.NovelChapterMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.ppnovel.web.util.SaTokenUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +22,18 @@ import java.util.List;
 
 @Service
 public class NovelBaseService {
-    private NovelCategoryMapper novelCategoryMapper;
+    private final NovelCategoryMapper novelCategoryMapper;
+    private final NovelMapper novelMapper;
+    private final NovelChapterMapper novelChapterMapper;
 
     public  NovelBaseService(
-        NovelCategoryMapper novelCategoryMapper
+        NovelCategoryMapper novelCategoryMapper,
+        NovelMapper novelMapper,
+        NovelChapterMapper novelChapterMapper
     ) {
         this.novelCategoryMapper = novelCategoryMapper;
+        this.novelMapper = novelMapper;
+        this.novelChapterMapper = novelChapterMapper;
     }
     private String getParentCategoryName(Integer parentId) {
         var map = new HashMap<Integer, String>();
@@ -52,4 +65,15 @@ public class NovelBaseService {
        }
        return novelCategoriesRes;
    };
+
+    public PageResponse<NovelPageListRes> getNovelPageList(NovelPageListReq req) {
+        Page<NovelPageListRes> page = new Page<>(req.getPage(), req.getSize());
+        Page<NovelPageListRes> resPage = novelMapper.selectNovelPage(page, req);
+        return new PageResponse<>(resPage);
+    }
+
+    public List<NovelCatelogRes> getNovelCatalog(Integer novelId) {
+        Integer userId = SaTokenUtil.getUserId();
+        return novelChapterMapper.getNovelCatalog(novelId, userId);
+    }
 }

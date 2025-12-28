@@ -79,6 +79,8 @@ export interface IRCreateChapterReq {
     content?: string;
     /** 作者有话说 */
     authorRemark?: string;
+    /** 价格，单位元，0 为免费 */
+    price?: number;
     /** 书本 ID */
     bookId?: number;
 }
@@ -91,4 +93,47 @@ export function RCreateChapter(data: IRCreateChapterReq) {
 /** 作家书本列表 */
 export function RGetWriterNovelList() {
     return request.get<IRWriterSelfNovelListItem[]>("/writer-novel/list");
+}
+
+/** 小说最新章节信息（读者端列表） */
+export const ZNovelPageNewestChapter = z.object({
+    title: z.string(),
+    date: z.string(),
+    idx: z.number().int(),
+});
+
+/** 小说分页列表条目（读者端） */
+export const ZNovelPageListItem = z.object({
+    cover: z.string().nullable().optional(),
+    title: z.string(),
+    author: z.string(),
+    status: z.number().int(),
+    totalWordCount: z.union([z.number(), z.string()]),
+    description: z.string().nullable().optional(),
+    newestChapter: ZNovelPageNewestChapter.nullable().optional(),
+});
+
+export type IRNovelPageListItem = z.infer<typeof ZNovelPageListItem>;
+
+export interface IRNovelPageListReq {
+    page?: number;
+    size?: number;
+    category?: number;
+    wordCount?: number;
+    status?: number;
+}
+
+export const ZPageResponse = <T extends z.ZodTypeAny>(schema: T) => z.object({
+    page: z.union([z.number(), z.string()]).transform(Number),
+    size: z.union([z.number(), z.string()]).transform(Number),
+    total: z.union([z.number(), z.string()]).transform(Number),
+    rows: z.array(schema),
+});
+
+export const ZNovelPageListResponse = ZPageResponse(ZNovelPageListItem);
+export type IRNovelPageListRes = z.infer<typeof ZNovelPageListResponse>;
+
+/** 获取小说分页数据（读者端） */
+export function RGetNovelPageList(data: IRNovelPageListReq) {
+    return request.post<IRNovelPageListRes>("/novel-common/page-list", data);
 }

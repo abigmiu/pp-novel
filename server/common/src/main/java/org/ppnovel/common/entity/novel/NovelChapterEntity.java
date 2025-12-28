@@ -5,12 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.ppnovel.common.entity.BaseEntity;
 
 import java.math.BigDecimal;
 
 @Data
 @TableName("novel_chapter")
-public class NovelChapterEntity {
+public class NovelChapterEntity extends BaseEntity {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 

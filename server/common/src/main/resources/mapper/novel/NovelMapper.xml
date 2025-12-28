@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ppnovel.common.mapper.novel.NovelMapper">
+
+    <resultMap id="NovelPageListResMap" type="org.ppnovel.common.dto.web.novel.NovelPageListRes">
+        <result property="cover" column="cover"/>
+        <result property="title" column="title"/>
+        <result property="author" column="author"/>
+        <result property="status" column="status"/>
+        <result property="totalWordCount" column="total_word_count"/>
+        <result property="description" column="description"/>
+        <association property="newestChapter" javaType="org.ppnovel.common.dto.web.novel.NovelPageListRes$NewestChapter">
+            <result property="title" column="chapter_title"/>
+            <result property="date" column="chapter_date"/>
+            <result property="idx" column="chapter_idx"/>
+        </association>
+    </resultMap>
+
+    <select id="selectNovelPage" resultMap="NovelPageListResMap">
+        SELECT
+            n.cover,
+            n.title,
+            u.pseudonym AS author,
+            n.status,
+            n.word_count AS total_word_count,
+            n.description,
+            nc.title      AS chapter_title,
+            nc.updated_at AS chapter_date,
+            nc.chapter_idx
+        FROM novel n
+            LEFT JOIN user u ON u.id = n.author_id
+            LEFT JOIN (
+                SELECT book_id, MAX(chapter_idx) AS max_idx
+                FROM novel_chapter
+                GROUP BY book_id
+            ) lc ON lc.book_id = n.id
+            LEFT JOIN novel_chapter nc ON nc.book_id = lc.book_id AND nc.chapter_idx = lc.max_idx
+        <where>
+            <if test="req.category != null">
+                AND EXISTS (
+                    SELECT 1 FROM novel_relate_category nrc
+                    WHERE nrc.novel_id = n.id
+                      AND nrc.category_id = #{req.category}
+                      AND nrc.category_type = 1
+                )
+            </if>
+            <if test="req.status != null">
+                AND n.status = #{req.status}
+            </if>
+            <if test="req.wordCount != null">
+                AND n.word_count &gt;= #{req.wordCount}
+            </if>
+            AND (n.is_delete = 0 OR n.is_delete IS NULL)
+        </where>
+        ORDER BY n.updated_at DESC
+    </select>
+</mapper>
