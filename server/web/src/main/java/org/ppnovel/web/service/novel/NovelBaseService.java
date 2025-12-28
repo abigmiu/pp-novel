@@ -3,6 +3,7 @@ package org.ppnovel.web.service.novel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.ppnovel.common.dto.common.PageResponse;
 import org.ppnovel.common.dto.web.novel.NovelCatelogRes;
+import org.ppnovel.common.dto.web.novel.NovelDetailRes;
 import org.ppnovel.common.dto.web.novel.NovelPageListReq;
 import org.ppnovel.common.dto.web.novel.NovelPageListRes;
 import org.ppnovel.common.dto.web.novel.common.NovelCategoryRes;
@@ -75,5 +76,13 @@ public class NovelBaseService {
     public List<NovelCatelogRes> getNovelCatalog(Integer novelId) {
         Integer userId = SaTokenUtil.getUserId();
         return novelChapterMapper.getNovelCatalog(novelId, userId);
+    }
+
+    public NovelDetailRes getNovelDetail(Integer novelId) {
+        NovelDetailRes detail = novelMapper.getNovelDetail(novelId);
+        if (detail == null) {
+            throw new BusinessException("小说不存在");
+        }
+        return detail;
     }
 }

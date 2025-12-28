@@ -26,6 +26,9 @@ public class NovelPageListRes {
     @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "封面")
     private String cover;
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "id")
+    private Integer id;
+
     /**
      * 书名
      */

@@ -5,6 +5,7 @@
 <mapper namespace="org.ppnovel.common.mapper.novel.NovelMapper">
 
     <resultMap id="NovelPageListResMap" type="org.ppnovel.common.dto.web.novel.NovelPageListRes">
+        <result property="id" column="id"></result>
         <result property="cover" column="cover"/>
         <result property="title" column="title"/>
         <result property="author" column="author"/>
@@ -18,8 +19,27 @@
         </association>
     </resultMap>
 
+    <resultMap id="NovelDetailResMap" type="org.ppnovel.common.dto.web.novel.NovelDetailRes">
+        <id property="novelId" column="novel_id"/>
+        <result property="title" column="title"/>
+        <result property="cover" column="cover"/>
+        <result property="description" column="description"/>
+        <result property="author" column="author"/>
+        <result property="authorId" column="author_id"/>
+        <association property="newestChapter" javaType="org.ppnovel.common.dto.web.novel.NovelDetailRes$NewestChapter">
+            <result property="title" column="chapter_title"/>
+            <result property="date" column="chapter_date"/>
+            <result property="idx" column="chapter_idx"/>
+        </association>
+        <collection property="categoryItems" ofType="org.ppnovel.common.dto.web.novel.NovelDetailRes$CategoryItem">
+            <result property="id" column="category_id"/>
+            <result property="title" column="category_title"/>
+        </collection>
+    </resultMap>
+
     <select id="selectNovelPage" resultMap="NovelPageListResMap">
         SELECT
+            n.id,
             n.cover,
             n.title,
             u.pseudonym AS author,
@@ -55,5 +75,36 @@
             AND (n.is_delete = 0 OR n.is_delete IS NULL)
         </where>
         ORDER BY n.updated_at DESC
+    </select>
+
+
+    <select id="getNovelDetail" resultMap="NovelDetailResMap">
+        SELECT
+            n.id         AS novel_id,
+            n.title,
+            n.cover,
+            n.description,
+            u.pseudonym  AS author,
+            n.author_id,
+            nc.title      AS chapter_title,
+            nc.updated_at AS chapter_date,
+            nc.chapter_idx,
+            c.id   AS category_id,
+            c.name AS category_title
+        FROM novel n
+                 LEFT JOIN user u ON u.id = n.author_id
+                 LEFT JOIN (
+                    SELECT ch.book_id, ch.title, ch.updated_at, ch.chapter_idx
+                    FROM novel_chapter ch
+                             INNER JOIN (
+                        SELECT book_id, MAX(chapter_idx) AS max_idx
+                        FROM novel_chapter
+                        GROUP BY book_id
+                    ) latest ON latest.book_id = ch.book_id AND latest.max_idx = ch.chapter_idx
+        ) nc ON nc.book_id = n.id
+                 LEFT JOIN novel_relate_category nrc ON nrc.novel_id = n.id
+                 LEFT JOIN novel_category c ON c.id = nrc.category_id
+        WHERE n.id = #{id}
+          AND (n.is_delete = 0 OR n.is_delete IS NULL)
     </select>
 </mapper>

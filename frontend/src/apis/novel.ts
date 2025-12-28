@@ -104,6 +104,8 @@ export const ZNovelPageNewestChapter = z.object({
 
 /** 小说分页列表条目（读者端） */
 export const ZNovelPageListItem = z.object({
+    id: z.number().int().optional(),
+    novelId: z.number().int().optional(),
     cover: z.string().nullable().optional(),
     title: z.string(),
     author: z.string(),
@@ -136,4 +138,48 @@ export type IRNovelPageListRes = z.infer<typeof ZNovelPageListResponse>;
 /** 获取小说分页数据（读者端） */
 export function RGetNovelPageList(data: IRNovelPageListReq) {
     return request.post<IRNovelPageListRes>("/novel-common/page-list", data);
+}
+
+export const ZNovelDetailCategory = z.object({
+    title: z.string(),
+    id: z.number().int(),
+});
+
+export const ZNovelDetailNewestChapter = z.object({
+    title: z.string(),
+    date: z.string(),
+    idx: z.number().int(),
+});
+
+export const ZNovelDetail = z.object({
+    title: z.string(),
+    novelId: z.number().int(),
+    cover: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    newestChapter: ZNovelDetailNewestChapter.nullable().optional(),
+    categoryItems: z.array(ZNovelDetailCategory),
+    author: z.string(),
+    authorId: z.number().int(),
+});
+
+export type IRNovelDetail = z.infer<typeof ZNovelDetail>;
+
+export const ZNovelCatalogItem = z.object({
+    title: z.string(),
+    chapterId: z.number().int(),
+    feeable: z.boolean(),
+    paied: z.boolean(),
+    idx: z.number().int(),
+});
+
+export type IRNovelCatalogItem = z.infer<typeof ZNovelCatalogItem>;
+
+/** 小说详情 */
+export function RGetNovelDetail(id: number) {
+    return request.get<IRNovelDetail>("/novel-common/detail", { id });
+}
+
+/** 小说目录 */
+export function RGetNovelCatalog(id: number) {
+    return request.get<IRNovelCatalogItem[]>("/novel-common/catalog", { id });
 }

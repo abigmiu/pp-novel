@@ -1,0 +1,304 @@
+@use "../../../assets/_mixin.scss" as mixin;
+
+@include mixin.b("novel-detail") {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    @include mixin.e("breadcrumb") {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 10px;
+
+        a {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover {
+                color: rgb(var(--primary-6));
+            }
+        }
+
+        .arco-icon {
+            font-size: 12px;
+        }
+    }
+
+    @include mixin.e("hero") {
+        background: linear-gradient(120deg, #fff, #fff6f1);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    @include mixin.e("hero-body") {
+        display: flex;
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    @include mixin.e("cover") {
+        width: 186px;
+        height: 248px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f6f6f6;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    @include mixin.e("cover-placeholder") {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        color: #aaa;
+        font-weight: 700;
+        letter-spacing: 1px;
+        background: repeating-linear-gradient(
+            45deg,
+            #fafafa,
+            #fafafa 10px,
+            #f0f0f0 10px,
+            #f0f0f0 20px
+        );
+    }
+
+    @include mixin.e("hero-main") {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    @include mixin.e("title-row") {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    @include mixin.e("title") {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1f1f1f;
+    }
+
+    @include mixin.e("status") {
+        border-radius: 12px;
+        padding: 2px 10px;
+    }
+
+    @include mixin.e("tags") {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    @include mixin.e("stat-line") {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #666;
+        font-size: 13px;
+    }
+
+    @include mixin.e("stat") {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        .arco-icon {
+            color: rgb(var(--primary-6));
+        }
+    }
+
+    @include mixin.e("dot") {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #d9d9d9;
+    }
+
+    @include mixin.e("update") {
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+    }
+
+    @include mixin.e("update-title") {
+        margin-left: 4px;
+        margin-right: 10px;
+        color: #1f1f1f;
+        font-weight: 600;
+    }
+
+    @include mixin.e("update-time") {
+        color: #888;
+    }
+
+    @include mixin.e("actions") {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: auto;
+
+        .arco-btn {
+            min-width: 108px;
+        }
+    }
+
+    @include mixin.e("hero-author") {
+        width: 190px;
+        border-left: 1px dashed #eee;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: #444;
+    }
+
+    @include mixin.e("author-avatar") {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #ffe6cf, #ffb88c);
+        color: #a05d2a;
+        font-weight: 700;
+        font-size: 18px;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    @include mixin.e("author-name") {
+        font-weight: 700;
+        color: #1f1f1f;
+    }
+
+    @include mixin.e("author-label") {
+        color: #f59e0b;
+        background: #fff4e6;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+    }
+
+    @include mixin.e("section") {
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    @include mixin.e("section-header") {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    @include mixin.e("section-title") {
+        font-size: 20px;
+        font-weight: 700;
+        color: #222;
+    }
+
+    @include mixin.e("section-sub") {
+        color: #888;
+        font-size: 13px;
+    }
+
+    @include mixin.e("description") {
+        margin-top: 12px;
+        color: #555;
+        line-height: 1.8;
+        font-size: 14px;
+        white-space: pre-wrap;
+    }
+
+    @include mixin.e("catalog-loading") {
+        padding: 40px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    @include mixin.e("catalog-empty") {
+        padding: 20px 0;
+    }
+
+    @include mixin.e("catalog-grid") {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    @include mixin.e("catalog-item") {
+        display: grid;
+        grid-template-columns: 80px 1fr auto;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #fafafa;
+        border: 1px solid #f3f3f3;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: #fff7f2;
+            border-color: #ffe0cc;
+            box-shadow: 0 8px 18px rgba(255, 95, 0, 0.08);
+        }
+    }
+
+    @include mixin.e("catalog-idx") {
+        color: #888;
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    @include mixin.e("catalog-title") {
+        color: #333;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @include mixin.e("catalog-lock") {
+        color: #f97316;
+    }
+
+    @include mixin.e("loading-placeholder") {
+        padding: 60px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    @media (max-width: 960px) {
+        @include mixin.e("hero-body") {
+            flex-direction: column;
+        }
+
+        @include mixin.e("hero-author") {
+            width: 100%;
+            flex-direction: row;
+            gap: 14px;
+            justify-content: flex-start;
+            border-left: none;
+            border-top: 1px dashed #eee;
+            padding-top: 12px;
+        }
+
+        @include mixin.e("catalog-grid") {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        }
+    }
+}

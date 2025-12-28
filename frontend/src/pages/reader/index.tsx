@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Empty, Message, Pagination, Spin } from "@arco-design/web-react";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router";
 import { useNamespace } from "@/hooks/useNameSpace";
 import {
     RGetNovelCategories,
@@ -65,6 +66,7 @@ const categoryTabs: {
 
 const ReaderIndex = () => {
     const ns = useNamespace("reader-index");
+    const navigate = useNavigate();
 
     const [readerType, setReaderType] = useState<ReaderType | undefined>(undefined);
     const [categories, setCategories] = useState<IRNovelCategory[]>([]);
@@ -299,6 +301,14 @@ const ReaderIndex = () => {
         );
     };
 
+    const handleCardClick = (novelId?: number) => {
+        if (!novelId) {
+            Message.info("该作品暂无详情页");
+            return;
+        }
+        navigate(`/reader/novel/${novelId}`);
+    };
+
     return (
         <div className={ns.b()}>
             <div className="serial-card serial-card-large">
@@ -343,38 +353,47 @@ const ReaderIndex = () => {
                         </div>
                     ) : (
                         <div className={ns.e("list")}>
-                            {sortedNovels.map((item, idx) => (
-                                <div className={ns.e("card")} key={`${item.title}-${idx}`}>
-                                    <div className={ns.e("cover")}>
-                                        {item.cover ? (
-                                            <img src={item.cover} alt={item.title} />
-                                        ) : (
-                                            <div className={ns.e("cover-placeholder")}>
-                                                <span>{item.title.slice(0, 2)}</span>
+                            {sortedNovels.map((item, idx) => {
+                                const novelId = item.novelId ?? item.id;
+                                return (
+                                    <div
+                                        className={ns.e("card")}
+                                        key={novelId ?? `${item.title}-${idx}`}
+                                        onClick={() => handleCardClick(novelId)}
+                                        role="button"
+                                        style={{ cursor: novelId ? "pointer" : "default" }}
+                                    >
+                                        <div className={ns.e("cover")}>
+                                            {item.cover ? (
+                                                <img src={item.cover} alt={item.title} />
+                                            ) : (
+                                                <div className={ns.e("cover-placeholder")}>
+                                                    <span>{item.title.slice(0, 2)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className={ns.e("content")}>
+                                            <div className={ns.e("title-row")}>
+                                                <div className={ns.e("title")}>{item.title}</div>
+                                                <div className={ns.e("status")}>{formatStatus(item.status)}</div>
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className={ns.e("content")}>
-                                        <div className={ns.e("title-row")}>
-                                            <div className={ns.e("title")}>{item.title}</div>
-                                            <div className={ns.e("status")}>{formatStatus(item.status)}</div>
-                                        </div>
-                                        <div className={ns.e("meta")}>
-                                            <span>作者：{item.author}</span>
-                                            <span>字数：{formatWordCount(item.totalWordCount)}</span>
-                                            <span>更新时间：{formatUpdateTime(item.newestChapter?.date || null)}</span>
-                                        </div>
-                                        {item.newestChapter && (
-                                            <div className={ns.e("latest")}>
-                                                最新：第{item.newestChapter.idx}章 {item.newestChapter.title}
+                                            <div className={ns.e("meta")}>
+                                                <span>作者：{item.author}</span>
+                                                <span>字数：{formatWordCount(item.totalWordCount)}</span>
+                                                <span>更新时间：{formatUpdateTime(item.newestChapter?.date || null)}</span>
                                             </div>
-                                        )}
-                                        <div className={ns.e("desc")}>
-                                            {item.description || "暂无简介"}
+                                            {item.newestChapter && (
+                                                <div className={ns.e("latest")}>
+                                                    最新：第{item.newestChapter.idx}章 {item.newestChapter.title}
+                                                </div>
+                                            )}
+                                            <div className={ns.e("desc")}>
+                                                {item.description || "暂无简介"}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </Spin>

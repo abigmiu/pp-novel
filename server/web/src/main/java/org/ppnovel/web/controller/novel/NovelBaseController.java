@@ -4,9 +4,9 @@ package org.ppnovel.web.controller.novel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
-import org.apache.ibatis.annotations.Param;
 import org.ppnovel.common.dto.common.PageResponse;
 import org.ppnovel.common.dto.web.novel.NovelCatelogRes;
+import org.ppnovel.common.dto.web.novel.NovelDetailRes;
 import org.ppnovel.common.dto.web.novel.NovelPageListReq;
 import org.ppnovel.common.dto.web.novel.NovelPageListRes;
 import org.ppnovel.common.dto.web.novel.common.NovelCategoryRes;
@@ -40,7 +40,13 @@ public class NovelBaseController {
 
     @Operation(summary = "获取小说目录")
     @GetMapping("catalog")
-    public List<NovelCatelogRes> getNovelCatalog(@Param("id") Integer novelId) {
+    public List<NovelCatelogRes> getNovelCatalog(@RequestParam("id") Integer novelId) {
         return   novelBaseService.getNovelCatalog(novelId);
+    }
+
+    @Operation(summary = "小说详情")
+    @GetMapping("detail")
+    public NovelDetailRes  getNovelDetail(@RequestParam("id") Integer id) {
+        return novelBaseService.getNovelDetail(id);
     }
 }

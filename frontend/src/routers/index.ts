@@ -1,5 +1,6 @@
 import ReaderLayout from "@/components/reader/ReaderLayout";
 import ReaderIndex from "@/pages/reader";
+import NovelDetailPage from "@/pages/reader/novel";
 import WalletPage from "@/pages/reader/wallet";
 import WriterLoginPage from "@/pages/writer/login";
 import { createBrowserRouter } from "react-router";
@@ -11,12 +12,12 @@ const router = createBrowserRouter([
         Component: ReaderLayout,
         children: [
             {
-                path: '/',
+                path: '/reader',
                 Component: ReaderIndex,
             },
             {
-                path: '/reader',
-                Component: ReaderIndex,
+                path: '/reader/novel/:id',
+                Component: NovelDetailPage,
             },
             {
                 path: '/wallet',
