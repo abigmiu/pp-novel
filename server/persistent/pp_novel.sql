@@ -215,6 +215,51 @@ CREATE TABLE `chapter_access` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='章节授权';
 
 -- ----------------------------
+-- Table structure for novel_user_favorite
+-- ----------------------------
+DROP TABLE IF EXISTS `novel_user_favorite`;
+CREATE TABLE `novel_user_favorite` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `novel_id` int NOT NULL COMMENT '小说ID',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_novel_favorite` (`user_id`,`novel_id`),
+  KEY `idx_favorite_novel` (`novel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说收藏';
+
+-- ----------------------------
+-- Table structure for novel_user_like
+-- ----------------------------
+DROP TABLE IF EXISTS `novel_user_like`;
+CREATE TABLE `novel_user_like` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `novel_id` int NOT NULL COMMENT '小说ID',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_novel_like` (`user_id`,`novel_id`),
+  KEY `idx_like_novel` (`novel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说点赞';
+
+-- ----------------------------
+-- Table structure for novel_user_follow
+-- ----------------------------
+DROP TABLE IF EXISTS `novel_user_follow`;
+CREATE TABLE `novel_user_follow` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `novel_id` int NOT NULL COMMENT '小说ID',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_novel_follow` (`user_id`,`novel_id`),
+  KEY `idx_follow_novel` (`novel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说追更';
+
+-- ----------------------------
 -- Column updates for novel_chapter
 -- ----------------------------
 ALTER TABLE `novel_chapter`

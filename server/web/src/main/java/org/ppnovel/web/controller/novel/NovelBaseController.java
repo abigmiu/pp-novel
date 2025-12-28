@@ -49,4 +49,40 @@ public class NovelBaseController {
     public NovelDetailRes  getNovelDetail(@RequestParam("id") Integer id) {
         return novelBaseService.getNovelDetail(id);
     }
+
+    @Operation(summary = "收藏小说")
+    @PostMapping("favorite")
+    public void favoriteNovel(@RequestParam("id") Integer novelId) {
+        novelBaseService.favoriteNovel(novelId);
+    }
+
+    @Operation(summary = "取消收藏小说")
+    @DeleteMapping("favorite")
+    public void cancelFavoriteNovel(@RequestParam("id") Integer novelId) {
+        novelBaseService.cancelFavoriteNovel(novelId);
+    }
+
+    @Operation(summary = "点赞小说")
+    @PostMapping("like")
+    public void likeNovel(@RequestParam("id") Integer novelId) {
+        novelBaseService.likeNovel(novelId);
+    }
+
+    @Operation(summary = "取消点赞小说")
+    @DeleteMapping("like")
+    public void cancelLikeNovel(@RequestParam("id") Integer novelId) {
+        novelBaseService.cancelLikeNovel(novelId);
+    }
+
+    @Operation(summary = "追更小说")
+    @PostMapping("follow")
+    public void followNovel(@RequestParam("id") Integer novelId) {
+        novelBaseService.followNovel(novelId);
+    }
+
+    @Operation(summary = "取消追更小说")
+    @DeleteMapping("follow")
+    public void cancelFollowNovel(@RequestParam("id") Integer novelId) {
+        novelBaseService.cancelFollowNovel(novelId);
+    }
 }

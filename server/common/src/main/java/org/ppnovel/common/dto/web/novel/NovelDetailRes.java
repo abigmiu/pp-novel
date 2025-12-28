@@ -55,4 +55,22 @@ public class NovelDetailRes {
 
     @Schema(description = "作者id", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer authorId;
+
+    @Schema(description = "收藏数", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long favoriteCount;
+
+    @Schema(description = "点赞数", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long likeCount;
+
+    @Schema(description = "追更数", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long followCount;
+
+    @Schema(description = "是否已收藏", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private boolean favorited;
+
+    @Schema(description = "是否已点赞", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private boolean liked;
+
+    @Schema(description = "是否已追更", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private boolean followed;
 }
