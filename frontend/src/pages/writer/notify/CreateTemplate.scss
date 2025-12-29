@@ -1,0 +1,45 @@
+.notify-template {
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    &__form {
+        max-width: 820px;
+    }
+
+    &__channels {
+        width: 100%;
+    }
+
+    &__channel-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border: 1px solid #f2f3f5;
+        border-radius: 10px;
+        background: #fafafa;
+    }
+
+    &__channel-label {
+        font-weight: 600;
+    }
+
+    &__channel-code {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    &__mask-tip {
+        display: block;
+        margin-top: 6px;
+    }
+}

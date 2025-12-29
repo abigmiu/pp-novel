@@ -1,13 +1,14 @@
+import { useEffect, useState } from "react";
 import LayoutHeader from "../layout/LayoutHeader";
 import Logo from '@/assets/logo.svg';
 import LayoutHeaderUserInfo from "@/components/layout/LayoutHeaderUserInfo";
 import { useNamespace } from "@/hooks/useNameSpace";
-import { Divider } from "@arco-design/web-react";
-import type { ReactNode } from "react";
+import { Badge, Divider } from "@arco-design/web-react";
 import type React from "react";
-import { Link, Outlet, useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import './WriteLayout.scss';
 import { IconUp } from "@arco-design/web-react/icon";
+import { RGetWriterUnreadCount, ZUnreadCount } from "@/apis/notify";
 
 const LayoutMenu: React.FC = () => {
     // 这里应该是通过icon + 数组渲染， 懒得做
@@ -24,6 +25,11 @@ const LayoutMenu: React.FC = () => {
 
                 </div>
                 <div className={`${ns.e('menu-item-label')}`}>工作台</div>
+            </div>
+            <div className={`${ns.e('menu-item')}`} onClick={() => navigate('/writer/notify/site-message')}>
+                <div className={`${ns.e('menu-item-icon')}`}>
+                </div>
+                <div className={`${ns.e('menu-item-label')}`}>站内信</div>
             </div>
             <div className={`${ns.e('menu-item')}`}>
                 <div className={`${ns.e('menu-item-icon')}`}>
@@ -182,6 +188,24 @@ const LayoutMenu: React.FC = () => {
 
 const WriterLayout: React.FC = () => {
     const ns = useNamespace('writer-layout')
+    const navigate = useNavigate();
+    const [unreadCount, setUnreadCount] = useState<number>(0);
+
+    const fetchUnread = async () => {
+        try {
+            const res = await RGetWriterUnreadCount();
+            const parsed = ZUnreadCount.safeParse(res);
+            setUnreadCount(parsed.success ? parsed.data.count : 0);
+        } catch (error) {
+            console.error(error);
+            setUnreadCount(0);
+        }
+    };
+
+    useEffect(() => {
+        fetchUnread();
+    }, []);
+
     return (
         <div
             className={ns.b('')}
@@ -202,7 +226,20 @@ const WriterLayout: React.FC = () => {
                         <div className="writer-header-menu">西红柿小说网</div>
                         <div className="writer-header-menu">作家课堂</div>
                         <div className="writer-header-menu">作家福利</div>
-                        <div className="writer-header-menu">消息通知</div>
+                        <div
+                            className="writer-header-menu"
+                            onClick={() => navigate('/writer/notify/site-message')}
+                        >
+                            <Badge count={unreadCount} maxCount={99}>
+                                站内信
+                            </Badge>
+                        </div>
+                        <div
+                            className="writer-header-menu"
+                            onClick={() => navigate('/writer/notify/template/create')}
+                        >
+                            消息模板
+                        </div>
                         <Divider type={'vertical'}></Divider>
                         <LayoutHeaderUserInfo></LayoutHeaderUserInfo>
 

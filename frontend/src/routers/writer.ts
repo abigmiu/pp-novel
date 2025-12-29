@@ -6,6 +6,8 @@ import NovelList from "@/pages/writer/novel/NovelList";
 import MyShortStory from "@/pages/writer/shortStory/MyShortStory";
 import DraftList from "@/pages/writer/shortStory/DraftList";
 import ShortStoryPublish from "@/pages/writer/write/ShortStory";
+import CreateTemplatePage from "@/pages/writer/notify/CreateTemplate";
+import WriterSiteMessageList from "@/pages/writer/notify/SiteMessageList";
 import type { RouteObject } from "react-router";
 
 const writerRoutes: RouteObject[] = [
@@ -36,6 +38,14 @@ const writerRoutes: RouteObject[] = [
             {
                 path: 'novel/chapter/create',
                 Component: CreateChapter,
+            },
+            {
+                path: 'notify/template/create',
+                Component: CreateTemplatePage,
+            },
+            {
+                path: 'notify/site-message',
+                Component: WriterSiteMessageList,
             }
         ]
     },

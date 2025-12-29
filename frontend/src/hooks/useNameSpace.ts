@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext, useMemo } from 'react'
 
 export const defaultNamespace = 'xhs'
 const statePrefix = 'is-'

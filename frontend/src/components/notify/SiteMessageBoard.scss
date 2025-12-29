@@ -1,0 +1,94 @@
+@use "../../assets/_mixin.scss" as mixin;
+
+@include mixin.b('site-msg') {
+    position: relative;
+
+    @include mixin.e('header') {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    @include mixin.e('desc') {
+        display: block;
+        margin-top: 6px;
+    }
+
+    @include mixin.e('stats') {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    @include mixin.e('list') {
+        display: block;
+        margin-top: 16px;
+        min-height: 200px;
+    }
+
+    @include mixin.e('item') {
+        border: 1px solid #f2f3f5;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        background: #fcfcfd;
+        transition: all 0.2s ease;
+
+        &:hover {
+            border-color: #e8ebf0;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+            transform: translateY(-1px);
+        }
+    }
+
+    @include mixin.e('item-head') {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    @include mixin.e('title') {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: #1d2129;
+    }
+
+    @include mixin.e('title-text') {
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    @include mixin.e('item-meta') {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 6px 0 4px;
+    }
+
+    @include mixin.e('item-id') {
+        font-size: 12px;
+    }
+
+    @include mixin.e('content') {
+        margin: 4px 0 0;
+    }
+
+    @include mixin.e('empty') {
+        padding: 40px 0;
+    }
+
+    @include mixin.e('pagination') {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+    }
+
+    @include mixin.e('server-unread') {
+        margin-left: 8px;
+    }
+}
