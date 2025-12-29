@@ -83,6 +83,11 @@ public class PayService {
         order.setRequestId(request.getRequestId());
         rechargeOrderMapper.insert(order);
 
+        WalletEntity lockedWallet = walletMapper.lockByUserId(userId);
+        if (lockedWallet == null) {
+            throw new BusinessException("充值失败，钱包不存在");
+        }
+
         // 模拟支付渠道：直接加钱并记流水
         int updated = walletMapper.increaseBalance(userId, request.getAmount());
         if (updated == 0) {
@@ -171,6 +176,12 @@ public class PayService {
         if (chapter == null) {
             throw new BusinessException("章节不存在");
         }
+
+        WalletEntity lockedWallet = walletMapper.lockByUserId(userId);
+        if (lockedWallet == null) {
+            throw new BusinessException("钱包不存在");
+        }
+
         BigDecimal price = Optional.ofNullable(chapter.getPrice()).orElse(BigDecimal.ZERO);
         if (price.compareTo(BigDecimal.ZERO) <= 0) {
             createChapterAccess(userId, chapterId);
@@ -180,6 +191,10 @@ public class PayService {
             response.setBalance(wallet.getBalance());
             response.setOrderNo(null);
             return response;
+        }
+
+        if (lockedWallet.getBalance().compareTo(price) < 0) {
+            throw new BusinessException("余额不足，请先充值");
         }
 
         String orderNo = NanoIdUtils.randomNanoId();

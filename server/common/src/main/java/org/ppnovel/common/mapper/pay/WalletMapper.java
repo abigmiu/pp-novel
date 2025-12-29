@@ -34,4 +34,7 @@ public interface WalletMapper extends BaseMapper<WalletEntity> {
         WHERE user_id = #{userId} AND balance >= #{amount} AND is_delete = 0
         """)
     int decreaseBalanceIfEnough(@Param("userId") Integer userId, @Param("amount") BigDecimal amount);
+
+    @Select("SELECT * FROM wallet WHERE user_id = #{userId} AND is_delete = 0 FOR UPDATE")
+    WalletEntity lockByUserId(@Param("userId") Integer userId);
 }
