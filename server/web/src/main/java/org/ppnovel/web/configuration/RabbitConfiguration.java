@@ -11,12 +11,15 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class RabbitConfiguration {
     public static final String EMAIL_QUEUE = "ppnovel-email.queue";
     public static final String EMAIL_EXCHANGE = "ppnovel-email.exchange";
     public static final String EMAIL_ROUTING_KEY = "ppnovel-email.send";
+
+    public static final String CHAPTER_AUDIT_QUEUE = "ppnovel-chapter-audit.queue";
+    public static final String CHAPTER_AUDIT_EXCHANGE = "ppnovel-chapter-audit.exchange";
+    public static final String CHAPTER_AUDIT_ROUTING_KEY = "ppnovel-chapter-audit.send";
 
     @Bean
     public Queue emailQueue() {
@@ -31,9 +34,27 @@ public class RabbitConfiguration {
     @Bean
     public Binding emailBinding() {
         return BindingBuilder
-            .bind(emailQueue())
-            .to(emailExchange())
-            .with(EMAIL_ROUTING_KEY);
+                .bind(emailQueue())
+                .to(emailExchange())
+                .with(EMAIL_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue chapterAuditQueue() {
+        return new Queue(CHAPTER_AUDIT_QUEUE, true);
+    }
+
+    @Bean
+    public DirectExchange chapterAuditExchange() {
+        return new DirectExchange(CHAPTER_AUDIT_EXCHANGE);
+    }
+
+    @Bean
+    public Binding chapterAuditBinding() {
+        return BindingBuilder
+            .bind(chapterAuditQueue())
+            .to(chapterAuditExchange())
+            .with(CHAPTER_AUDIT_ROUTING_KEY);
     }
 
     @Bean
@@ -43,10 +64,9 @@ public class RabbitConfiguration {
 
     @Bean
     public RabbitTemplate rabbitTemplate(
-        ConnectionFactory connectionFactory,
-        MessageConverter messageConverter
-    ) {
-        RabbitTemplate template = new RabbitTemplate( connectionFactory);
+            ConnectionFactory connectionFactory,
+            MessageConverter messageConverter) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter);
         return template;
     }

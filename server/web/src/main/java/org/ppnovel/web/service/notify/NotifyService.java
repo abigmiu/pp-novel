@@ -12,6 +12,7 @@ import org.ppnovel.common.dto.web.notify.NotifyListReq;
 import org.ppnovel.common.dto.web.notify.NotifyListRes;
 import org.ppnovel.common.dto.web.notify.NotifyTypeListRes;
 import org.ppnovel.common.dto.web.notify.ReaderUnreadCountRes;
+import org.ppnovel.common.dto.web.notify.NotifyTemplateRes;
 import org.ppnovel.common.dto.web.notify.WriterUnreadCountRes;
 import org.ppnovel.common.entity.notity.NotifyMessage;
 import org.ppnovel.common.entity.notity.NotifyTemplate;
@@ -123,6 +124,25 @@ public class NotifyService {
         notifyTemplateMapper.insert(notifyTemplate);
     }
 
+    /** 获取所有消息模板 */
+    public List<NotifyTemplateRes> getNotifyTemplateList() {
+        LambdaQueryWrapper<NotifyTemplate> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(NotifyTemplate::getCreatedAt);
+        List<NotifyTemplate> templateList = notifyTemplateMapper.selectList(queryWrapper);
+
+        return templateList.stream().map((item) -> {
+            NotifyTemplateRes res = new NotifyTemplateRes();
+            res.setId(item.getId());
+            res.setName(item.getName());
+            res.setType(item.getType());
+            res.setChannelMask(item.getChannelMask());
+            res.setTitleTpl(item.getTitleTpl());
+            res.setContentTpl(item.getContentTpl());
+            res.setEnable(item.isEnable());
+            return res;
+        }).toList();
+    }
+
     /** 返回消息通知业务类型列表 */
 
     public List<NotifyTypeListRes> getNotifyTypeListRes() {
@@ -144,7 +164,7 @@ public class NotifyService {
         LambdaQueryWrapper<NotifyMessage> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(NotifyMessage::getUserId, userId);
         queryWrapper.orderByDesc(NotifyMessage::getCreatedAt);
-        queryWrapper.eq(NotifyMessage::getType, 1); // 站内信
+        queryWrapper.eq(NotifyMessage::getChannelMask, 1); // 站内信
         queryWrapper.eq(NotifyMessage::getRoleType, 2);
 
         Page<NotifyMessage> pageQuery = new Page<>(req.getPage(), req.getSize());
@@ -162,6 +182,7 @@ public class NotifyService {
                     resItem.setHasRead(item.getReaderStatus() == 1);
                     resItem.setId(item.getId());
                     resItem.setTypeText(item.getType());
+                    resItem.setCreatedAt(item.getCreatedAt());
                     return resItem;
                 }).toList()
         );

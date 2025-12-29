@@ -50,7 +50,7 @@ public class NotifyMessage extends BaseEntity {
     private Integer channelMask;
 
     /** 消息已读状态 0未读,1已读 */
-    @TableField("reader_status")
+    @TableField("read_status")
     private Integer readerStatus;
 
     /** 已读时间 */

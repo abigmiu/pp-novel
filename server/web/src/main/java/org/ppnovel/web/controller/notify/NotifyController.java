@@ -7,6 +7,7 @@ import org.ppnovel.common.dto.web.notify.BatchReadReq;
 import org.ppnovel.common.dto.web.notify.CreateNotifyTemplateReq;
 import org.ppnovel.common.dto.web.notify.NotifyListReq;
 import org.ppnovel.common.dto.web.notify.NotifyListRes;
+import org.ppnovel.common.dto.web.notify.NotifyTemplateRes;
 import org.ppnovel.common.dto.web.notify.NotifyTypeListRes;
 import org.ppnovel.common.dto.web.notify.ReaderUnreadCountRes;
 import org.ppnovel.common.dto.web.notify.WriterUnreadCountRes;
@@ -39,6 +40,12 @@ public class NotifyController {
     @PostMapping("create-template")
     public void postMethodName(@RequestBody CreateNotifyTemplateReq req) {
         notifyService.createNotifyTemplate(req);
+    }
+
+    @Operation(summary = "获取消息模板列表")
+    @GetMapping("template-list")
+    public List<NotifyTemplateRes> getNotifyTemplateList() {
+        return notifyService.getNotifyTemplateList();
     }
 
     @Operation(summary = "获取消息模板业务类型")
