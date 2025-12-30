@@ -15,6 +15,7 @@ import org.ppnovel.common.mapper.UserMapper;
 import org.ppnovel.common.mapper.WriterStatMapper;
 import org.ppnovel.common.utils.EncryptUtil;
 import org.ppnovel.web.component.RedisUtil;
+import org.ppnovel.web.configuration.SignKeyProperties;
 import org.ppnovel.web.service.pay.WalletService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,19 +31,22 @@ public class AuthService {
     private final WriterStatMapper writerStatMapper;
     private final RedisUtil redisUtil;
     private final WalletService walletService;
+    private final SignKeyProperties signKeyProperties;
 
     public AuthService(
         UserMapper userMapper,
         RedisUtil redisUtil,
         WriterStatMapper writerStatMapper,
         FansFollowMapper fansFollowMapper,
-        WalletService walletService
+        WalletService walletService,
+        SignKeyProperties signKeyProperties
     ) {
         this.writerStatMapper = writerStatMapper;
         this.userMapper = userMapper;
         this.redisUtil = redisUtil;
         this.fansFollowMapper = fansFollowMapper;
         this.walletService = walletService;
+        this.signKeyProperties = signKeyProperties;
     }
 
     /**
@@ -108,7 +112,7 @@ public class AuthService {
     public WebAuthLoginResponse login(WebAuthLogin body) {
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", body.getEmail());
-        String signedPassword = EncryptUtil.encryptWebUserPassword(body.getPassword());
+        String signedPassword = EncryptUtil.encryptWebUserPassword(body.getPassword(), signKeyProperties.getWebUserPassword());
         queryWrapper.eq("password", signedPassword);
         UserEntity user = userMapper.selectOne(queryWrapper);
         if (user == null) {
@@ -140,7 +144,7 @@ public class AuthService {
         Long uid = generateUid();
         user.setUid(uid);
         user.setEmail(body.getEmail());
-        String signedPassword = EncryptUtil.encryptWebUserPassword(body.getPassword());
+        String signedPassword = EncryptUtil.encryptWebUserPassword(body.getPassword(), signKeyProperties.getWebUserPassword());
         user.setPassword(signedPassword);
         user.setPseudonym("用户" + uid);
         return user;

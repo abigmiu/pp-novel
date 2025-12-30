@@ -1,15 +1,11 @@
 package org.ppnovel.common.utils;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.DigestUtils;
 
 
 public class EncryptUtil {
-    @Value("${signKey.webUserPassword}")
-    private static String webUserPasswordSignKey;
-
-    public static String encryptWebUserPassword(String password) {
-        String saltPassword = password + webUserPasswordSignKey;
+    public static String encryptWebUserPassword(String password, String signKey) {
+        String saltPassword = password + signKey;
         return DigestUtils.md5DigestAsHex(saltPassword.getBytes());
     }
 
