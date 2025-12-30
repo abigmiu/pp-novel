@@ -2,10 +2,14 @@ package org.ppnovel.web.service.novel;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+
 import org.ppnovel.common.constant.NovelChapterStatus;
 import org.ppnovel.common.dto.web.novel.chapter.CreateChapterReq;
 import org.ppnovel.common.entity.novel.NovelChapterEntity;
 import org.ppnovel.common.entity.novel.NovelEntity;
+import org.ppnovel.common.es.ChapterESDoc;
 import org.ppnovel.common.exception.BusinessException;
 import org.ppnovel.common.mapper.novel.NovelChapterMapper;
 import org.ppnovel.common.mapper.novel.NovelMapper;
@@ -16,6 +20,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -26,13 +31,18 @@ public class WriterChapterService {
 
     private final NovelChapterMapper chapterMapper;
     private final NovelMapper novelMapper;
+    private final ElasticsearchClient esClient;
 
     public WriterChapterService(
             NovelChapterMapper chapterMapper,
-            NovelMapper novelMapper, RabbitTemplate rabbitTemplate) {
+            NovelMapper novelMapper, 
+            RabbitTemplate rabbitTemplate,
+             ElasticsearchClient esClient
+        ) {
         this.chapterMapper = chapterMapper;
         this.novelMapper = novelMapper;
         this.rabbitTemplate = rabbitTemplate;
+        this.esClient = esClient;
     }
 
     public Integer getBookMaxIdx(Integer authorId, Integer bookId) {
@@ -88,6 +98,27 @@ public class WriterChapterService {
 
         // 提交审核
         sendChapterToAudit(authorId, entity.getId());
+        saveToEs(entity);
+    }
+
+
+    public void saveToEs(NovelChapterEntity entity)  {
+        try {
+            ChapterESDoc doc = new ChapterESDoc();
+            doc.setAuthorId(entity.getAuthorId());
+            doc.setId(entity.getId());
+            doc.setTitle(entity.getTitle());
+            doc.setContent(entity.getContent());
+
+            esClient.index( i -> i
+                .index("chapter")
+                .id(entity.getId().toString())
+                .document(doc)
+            );
+        } catch (Exception e) {
+
+        }
+        
     }
 
     private void sendChapterToAudit(Integer userId, Integer chapterId) {

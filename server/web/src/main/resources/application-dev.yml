@@ -47,3 +47,8 @@ s3:
 #aliOss:
 #  accessKey: xxx
 #  secretKey: xxx
+
+elasticsearch:
+  host: localhost
+  port: 9200
+
